@@ -1,0 +1,66 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useApp } from '@/store/app-store'
+import { SettingsProvider } from '@/components/site/settings-context'
+import { Header } from '@/components/site/header'
+import { Footer } from '@/components/site/footer'
+import { SearchDialog } from '@/components/site/search-dialog'
+import { HomeView } from '@/components/public/home-view'
+import { PostView } from '@/components/public/post-view'
+import { CategoryView } from '@/components/public/category-view'
+import { BlogView } from '@/components/public/blog-view'
+import { AboutView } from '@/components/public/about-view'
+import { ContactView } from '@/components/public/contact-view'
+import { AdminApp } from '@/components/admin/admin-app'
+
+function PublicSite() {
+  const { route } = useApp()
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <Header />
+      <main className="flex-1">
+        {route.name === 'home' && <HomeView />}
+        {route.name === 'post' && <PostView slug={route.slug} />}
+        {route.name === 'category' && <CategoryView slug={route.slug} />}
+        {route.name === 'blog' && <BlogView />}
+        {route.name === 'search' && <BlogView initialQuery={route.q} />}
+        {route.name === 'about' && <AboutView />}
+        {route.name === 'contact' && <ContactView />}
+      </main>
+      <Footer />
+    </div>
+  )
+}
+
+function Shell() {
+  const { adminOpen, route } = useApp()
+
+  // Update document title based on route
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const base = 'Lumen Journal'
+      if (route.name === 'home') document.title = `${base} — Stories, ideas & thoughtful living`
+      else if (route.name === 'post') document.title = `${base}`
+      else if (route.name === 'blog') document.title = `${base} — All Articles`
+      else if (route.name === 'about') document.title = `${base} — About`
+      else if (route.name === 'contact') document.title = `${base} — Contact`
+    }
+  }, [route])
+
+  return (
+    <>
+      <PublicSite />
+      <SearchDialog />
+      {adminOpen && <AdminApp />}
+    </>
+  )
+}
+
+export default function Home() {
+  return (
+    <SettingsProvider>
+      <Shell />
+    </SettingsProvider>
+  )
+}
