@@ -14,8 +14,8 @@ import { toast } from 'sonner'
 import { CategoryIcon } from '@/lib/category-icons'
 import { slugify } from '@/lib/helpers'
 
-const ICON_OPTIONS = ['Heart', 'Home', 'Plane', 'UtensilsCrossed', 'BookOpen', 'Sparkles', 'Camera', 'Music', 'Palette', 'Dumbbell', 'Leaf', 'Globe', 'Coffee', 'Feather', 'Mountain', 'Sun']
-const COLOR_OPTIONS = ['#b45309', '#9a3412', '#a16207', '#854d0e', '#713f12', '#831843', '#7c5c3e', '#6b7280']
+const ICON_OPTIONS = ['Palette', 'Brush', 'Pencil', 'PenTool', 'Droplet', 'PaintBucket', 'Gem', 'Sparkles', 'Flower', 'Leaf', 'BookOpen', 'Globe', 'Camera', 'Feather', 'Sun', 'Mountain']
+const COLOR_OPTIONS = ['#0d7d6e', '#be185d', '#b45309', '#9333ea', '#854d0e', '#1e6b52', '#831843', '#0e7490']
 
 export function CategoriesManager() {
   const [categories, setCategories] = useState<(Category & { _count?: { posts: number } })[]>([])

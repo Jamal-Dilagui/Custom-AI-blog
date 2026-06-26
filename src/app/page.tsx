@@ -39,10 +39,10 @@ function Shell() {
   // Update document title based on route
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      const base = 'Lumen Journal'
-      if (route.name === 'home') document.title = `${base} — Stories, ideas & thoughtful living`
+      const base = 'Christine Britton'
+      if (route.name === 'home') document.title = `${base} — Fluid Art, Resin Art & Creative Drawing Tutorials`
       else if (route.name === 'post') document.title = `${base}`
-      else if (route.name === 'blog') document.title = `${base} — All Articles`
+      else if (route.name === 'blog') document.title = `${base} — All Tutorials`
       else if (route.name === 'about') document.title = `${base} — About`
       else if (route.name === 'contact') document.title = `${base} — Contact`
     }

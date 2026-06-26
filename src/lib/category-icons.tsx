@@ -1,7 +1,9 @@
 import {
   Heart, Home, Plane, UtensilsCrossed, BookOpen, Sparkles,
   Camera, Music, Palette, Dumbbell, Leaf, Globe, Coffee,
-  Feather, Mountain, Sun, type LucideProps,
+  Feather, Mountain, Sun,
+  Gem, Pencil, Brush, PenTool, Droplet, PaintBucket, Flower,
+  type LucideProps,
 } from 'lucide-react'
 
 // Stable component that maps a category icon name to the right lucide icon.
@@ -24,6 +26,13 @@ export function CategoryIcon({ name, ...props }: { name?: string | null } & Luci
     case 'Coffee': return <Coffee {...props} />
     case 'Mountain': return <Mountain {...props} />
     case 'Sun': return <Sun {...props} />
+    case 'Gem': return <Gem {...props} />
+    case 'Pencil': return <Pencil {...props} />
+    case 'Brush': return <Brush {...props} />
+    case 'PenTool': return <PenTool {...props} />
+    case 'Droplet': return <Droplet {...props} />
+    case 'PaintBucket': return <PaintBucket {...props} />
+    case 'Flower': return <Flower {...props} />
     case 'Feather':
     default:
       return <Feather {...props} />

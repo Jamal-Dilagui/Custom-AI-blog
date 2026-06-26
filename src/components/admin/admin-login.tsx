@@ -12,7 +12,7 @@ import { Lock, Mail, ArrowLeft, Shield, Loader2 } from 'lucide-react'
 
 export function AdminLogin({ onSuccess }: { onSuccess: (user: User) => void }) {
   const { closeAdmin } = useApp()
-  const [email, setEmail] = useState('admin@lumenjournal.com')
+  const [email, setEmail] = useState('admin@christinebritton.com')
   const [password, setPassword] = useState('admin123')
   const [loading, setLoading] = useState(false)
 
@@ -67,7 +67,7 @@ export function AdminLogin({ onSuccess }: { onSuccess: (user: User) => void }) {
         </form>
         <div className="mt-6 rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">
           <p className="font-medium text-foreground mb-1">Demo credentials</p>
-          <p>Email: admin@lumenjournal.com</p>
+          <p>Email: admin@christinebritton.com</p>
           <p>Password: admin123</p>
         </div>
       </div>

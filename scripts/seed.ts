@@ -2,27 +2,28 @@ import { db } from '../src/lib/db'
 import { hashPassword } from '../src/lib/auth'
 
 async function main() {
-  // Site settings
-  const setting = await db.siteSetting.upsert({
+  // Site settings — Christine Britton's real content
+  await db.siteSetting.upsert({
     where: { id: 'singleton' },
     update: {},
     create: {
       id: 'singleton',
-      siteName: 'Lumen Journal',
-      tagline: 'Stories, ideas & thoughtful living',
+      siteName: 'Christine Britton',
+      tagline: 'Fluid art, resin art & creative drawing tutorials',
       description:
-        'A modern editorial magazine exploring wellness, culture, home, travel and the art of slow living. Thoughtful writing for curious minds.',
-      logoText: 'Lumen',
-      primaryColor: '#b45309',
-      accentColor: '#9a3412',
-      email: 'hello@lumenjournal.com',
-      location: 'Portland, Oregon',
-      twitter: 'lumenjournal',
-      instagram: 'lumenjournal',
-      pinterest: 'lumenjournal',
-      aboutTitle: 'About Lumen Journal',
+        'Fluid art, resin art, doodle drawing and creative tutorials from a lifelong artist on the West coast of Scotland. Explore acrylic pouring, dutch pours, posca art, polymer clay and more — proof that creativity knows no age limits.',
+      logoText: 'Christine Britton',
+      primaryColor: '#0d7d6e',
+      accentColor: '#be185d',
+      email: 'hello@christinebritton.com',
+      location: 'West coast of Scotland',
+      twitter: 'fluidartpaint',
+      facebook: 'fluidartcommunity',
+      instagram: 'christinebrittonart',
+      pinterest: 'christinebrittonart',
+      aboutTitle: 'About Christine',
       aboutContent:
-        'Lumen Journal is an independent publication devoted to the art of living well. We write about wellness, home, travel, food and culture with honesty, curiosity and care. Our small team of writers and contributors believe that a good life is built from small, intentional choices — the morning ritual, the well-set table, the book read slowly, the trip taken without a plan. We are ad-supported so our stories can remain free for everyone.',
+        'As a child of the 60\'s I experienced many opportunities and freedoms to explore my world, which must have perplexed my poor parents at that time. Hippies, flower power, free love, festivals and protests. Anything was up for grabs as I pushed the boundaries that previous generations seemed to have accepted without question.\nI found myself engrossed in painting and sculpture and was thrilled when people wanted to purchase my creations. Soon I was off to university studying art and continuing to grow my creative thinking and enthusiasm for the subject.\nFollowing graduation I began teaching in a secondary school and real life arrived as a shock to the system. Marriage, mortgage and 6 children later and my artistic goals became sidelined.\nMy zest for learning new ways to express my creativity is alive and kicking! From pillows, blooms, dutch pours, swiping, embellishing and trying new recipes, this art form is exciting and engaging as I continue to learn new techniques. There\'s still life in the old girl yet and proof that anyone of any age can do this.\nI\'m also the author of The Quantum Prescription — Healing The Body With The Mind, exploring the intersection of creativity, consciousness, and healing.',
       aboutImage: '/uploads/about.jpg',
       adsenseClient: 'ca-pub-0000000000000000',
       adsenseSlotHeader: '0000000000',
@@ -30,36 +31,38 @@ async function main() {
       adsenseSlotSidebar: '0000000002',
       adsenseSlotFooter: '0000000003',
       adsEnabled: true,
-      newsletterTitle: 'The Sunday Lumen',
-      newsletterText: 'A weekly letter with our best stories, reading lists and slow-living rituals. No spam, ever.',
-      footerText: '© Lumen Journal. Made with care.',
+      newsletterTitle: 'The Creative Letter',
+      newsletterText: 'Weekly fluid art techniques, drawing prompts and step-by-step tutorials — straight to your inbox. No spam, ever.',
+      footerText: '© 2025 Christine Britton • All rights reserved',
     },
   })
 
-  // Admin user
-  const existing = await db.user.findUnique({ where: { email: 'admin@lumenjournal.com' } })
+  // Admin user — Christine Britton
+  const existing = await db.user.findUnique({ where: { email: 'admin@christinebritton.com' } })
   if (!existing) {
     await db.user.create({
       data: {
-        email: 'admin@lumenjournal.com',
-        name: 'Christine Marlow',
+        email: 'admin@christinebritton.com',
+        name: 'Christine Britton',
         password: hashPassword('admin123'),
         role: 'ADMIN',
-        bio: 'Founding editor of Lumen Journal. Writes about slow living, books and the small rituals that make a home.',
+        bio: 'Lifelong artist on the West coast of Scotland. Fluid art, resin art, drawing and a belief that creativity knows no age limits. Author of The Quantum Prescription.',
         avatar: '/uploads/author.jpg',
       },
     })
-    console.log('Created admin: admin@lumenjournal.com / admin123')
+    console.log('Created admin: admin@christinebritton.com / admin123')
   }
+  const admin = await db.user.findUnique({ where: { email: 'admin@christinebritton.com' } })
 
-  // Categories
+  // Categories — Christine Britton's real art style taxonomy
   const cats = [
-    { name: 'Wellness', description: 'Mind, body and the gentle practice of feeling well.', color: '#7c5c3e', icon: 'Heart' },
-    { name: 'Home & Living', description: 'Spaces, objects and the quiet craft of homemaking.', color: '#9a3412', icon: 'Home' },
-    { name: 'Travel', description: 'Slow journeys, places remembered and maps less followed.', color: '#a16207', icon: 'Plane' },
-    { name: 'Food', description: 'Seasonal recipes, kitchen notes and the table as ritual.', color: '#854d0e', icon: 'UtensilsCrossed' },
-    { name: 'Culture', description: 'Books, film, ideas and the conversations worth having.', color: '#713f12', icon: 'BookOpen' },
-    { name: 'Style', description: 'Considered wardrobes and the elegance of enough.', color: '#831843', icon: 'Sparkles' },
+    { name: 'Fluid Art', description: 'Acrylic pouring, dutch pours, blooms and swiping — the mesmerising world of fluid art.', color: '#0d7d6e', icon: 'Droplet' },
+    { name: 'Resin Art', description: 'Resin and epoxy techniques, geode coasters, ocean art and glossy finishes.', color: '#0e7490', icon: 'Gem' },
+    { name: 'Drawing', description: 'Pencil art, shading techniques, sketches and realistic drawing guides.', color: '#854d0e', icon: 'Pencil' },
+    { name: 'Doodle Art', description: 'Zentangle, doodle journals, name doodles and easy drawing ideas for beginners.', color: '#9333ea', icon: 'Sparkles' },
+    { name: 'Posca Art', description: 'Vibrant posca marker techniques, canvas art, flowers and scenic landscapes.', color: '#be185d', icon: 'PaintBucket' },
+    { name: 'Clay Art', description: 'Polymer clay, air dry clay, cardboard sculpture and handmade creations.', color: '#b45309', icon: 'Brush' },
+    { name: 'Art Culture', description: 'Famous artists, history of art and the movements that shaped creative expression.', color: '#713f12', icon: 'BookOpen' },
   ]
   const categoryMap: Record<string, { id: string }> = {}
   for (const c of cats) {
@@ -72,276 +75,538 @@ async function main() {
     categoryMap[c.name] = { id: cat.id }
   }
 
-  // Admin
-  const admin = await db.user.findUnique({ where: { email: 'admin@lumenjournal.com' } })
-
+  // Posts — Christine Britton's real article titles with authentic content
   const posts = [
     {
-      title: 'The Quiet Power of a Slow Morning',
-      slug: 'the-quiet-power-of-a-slow-morning',
-      category: 'Wellness',
-      excerpt: 'How a deliberate, unhurried start changes the texture of an entire day — and four small rituals to begin.',
-      coverImage: '/uploads/post-wellness.jpg',
-      coverAlt: 'A cup of tea by a sunlit window',
-      tags: 'morning ritual,mindfulness,slow living',
+      title: 'What Is Fluid Art Painting?',
+      slug: 'what-is-fluid-art-painting',
+      category: 'Fluid Art',
+      excerpt: 'Fluid art, or acrylic pouring, is a delightful blend of science and creativity where liquid acrylics are poured onto canvas to make stunning abstract patterns.',
+      coverImage: '/uploads/post-fluid.jpg',
+      coverAlt: 'A colourful acrylic pour painting with swirling cells',
+      tags: 'fluid art,acrylic pouring,abstract art,beginners',
       featured: true,
       trending: true,
-      content: `## There is a particular kind of light at six in the morning
+      content: `## A delightful blend of science and creativity
 
-It comes in low and gold through the kitchen window, and it asks nothing of you. For a long time I missed it. I would wake to an alarm, reach for the phone, and let the world pour in before I had even decided what kind of day I wanted to have.
+Fluid art painting, also known as **acrylic pouring**, is a delightful blend of science and creativity where artists pour liquid acrylics onto canvases to make stunning abstract patterns. Envision this: you layer colourful paints into a cup, flip it onto the canvas, and voilà — magic happens as the colours swirl and mix in unexpected ways.
 
-Then, one winter, I broke the habit. Not with a grand plan — only by leaving the phone in another room and refusing to set an alarm for a week.
+It's like watching a science experiment, but way cooler because you end up with unique art every time. This technique, rooted in the 1930s by artist David Alfaro Siqueiros, uses paint density and viscosity for spectacular effects.
 
-### What changed
+### Key takeaways
 
-The first thing I noticed was the noise. Not outside — inside. Without the constant incoming, I could hear my own thinking again. The second thing was time. Mornings, it turned out, were not short. I had been making them short by filling them with urgency.
+- Fluid art, or acrylic pouring, involves pouring acrylic paint onto a canvas to create abstract designs.
+- Originating in the 1930s, it blends science and creativity, pioneered by artist David Alfaro Siqueiros.
+- Techniques include dirty pour, clean pour, flip cup, and swipe — each creating unique visual effects.
+- The interaction of paint densities and viscosities is crucial for dynamic patterns and textures.
 
-> A slow morning is not a lazy morning. It is a deliberate one.
+### Definition and origins
 
-A few rituals emerged on their own, and I have kept them since.
+Fluid art painting, commonly known as acrylic pouring, is a contemporary art technique that involves pouring acrylic paint onto a canvas to create abstract designs and patterns. This dynamic and colourful art form has roots that can be traced back to the 1930s.
 
-### Four rituals worth keeping
+During this period, Mexican artist David Alfaro Siqueiros experimented with what he called "accidental painting." The spontaneous and unpredictable nature of this method laid the foundation for what we now recognise as fluid art.
 
-1. **Hot water before anything else.** Before coffee, before food. It is a small kindness to the body.
-2. **A page, not a feed.** One page of a real book. It sets the tone for attention.
-3. **A walk without a destination.** Ten minutes is enough. The point is the air, not the steps.
-4. **One intention.** Written by hand. Not a to-do list — a single sentence about how I want to meet the day.
+> Siqueiros' experiments combined elements of physics and chemistry, leveraging the natural behaviours of paint — its density and viscosity — to produce unexpected and often mesmerising results.
 
-None of this is revolutionary. That is the point. Slow mornings are not about adding more; they are about subtracting until the essential becomes visible again.
+### Techniques and methods
 
-### A note on imperfection
+Acrylic pouring encompasses various techniques such as **clean pour**, **dirty pour**, **flip cup**, and **swipe**, each offering distinct methods to manipulate paint on the canvas.
 
-Some mornings the phone wins. Some mornings I oversleep, or the children are sick, or there is a deadline that will not wait. The practice is not the perfect morning. The practice is returning, without shame, the next day.
+1. **Dirty pour** — layering multiple colours in a single cup before pouring, allowing for dynamic blending of hues.
+2. **Clean pour** — directly pouring each colour onto the canvas separately, maintaining clearer colour boundaries.
+3. **Flip cup** — the cup filled with various colours is flipped onto the canvas, resulting in unpredictable, mesmerising patterns.
+4. **Swipe** — uses a tool to drag paint across the canvas, creating intricate, wave-like effects.
 
-The light at six is patient. It will wait.`,
+Experimentation with colour combinations and additives like silicone oil can enhance cell formation, contributing to the artistic expression inherent in fluid art. Manipulating the canvas by tilting and turning it allows the paint to flow and spread, creating organic shapes and patterns as it moves.
+
+### Why fluid art is so popular
+
+Fluid art's unique blend of science and creativity continues to captivate artists and art enthusiasts alike. There's something deeply satisfying about the unpredictability — no two pours are ever the same, and the reveal is always a moment of pure delight.
+
+Whether you're a seasoned artist or a complete beginner picking up a brush for the first time, fluid art welcomes you with open arms. It's forgiving, it's messy, and it's endlessly surprising.`,
     },
     {
-      title: 'A Calmer Kitchen: Designing for the Life You Actually Have',
-      slug: 'a-calmer-kitchen-designing-for-the-life-you-actually-have',
-      category: 'Home & Living',
-      excerpt: 'The most beautiful kitchens are not the most expensive. They are the ones designed around real evenings and real mess.',
-      coverImage: '/uploads/post-home.jpg',
-      coverAlt: 'A calm, organised kitchen with herbs',
-      tags: 'kitchen,home design,organisation',
-      featured: true,
-      trending: false,
-      content: `## We are sold a fantasy of kitchens
-
-Marble islands wide enough to land a small aircraft. Brass tapware that costs more than a used car. Lights that belong in a museum.
-
-None of it is wrong. But almost none of it is about cooking — or about the life most of us actually live, which involves weeknight exhaustion, a child doing homework at the table, and a sink that is never empty for long.
-
-### Begin with the evening
-
-Before you choose a colour, ask a better question: *what does a Wednesday evening look like here?*
-
-If you cook with someone, is there room for two? If children do homework, where is the light good? Where does the post-school bag land? Where does the dirty pan go while dinner is still on the stove?
-
-Design for the mess, not the magazine.
-
-### Three principles
-
-**Keep the triangle, soften it.** The sink-stove-fridge triangle still matters, but the real luxury is a wide, clear counter between stove and sink — the landing strip for everything hot, heavy, or wet.
-
-**Light in layers.** Overhead light alone is a crime against evening cooking. Add under-cabinet light for the work, a low pendant for the table, and a dimmer so the room can become gentle after the dishes are done.
-
-**Storage you can reach.** A deep corner cabinet sounds generous until you are on your knees at seven p.m. looking for the cinnamon. Prefer shallow, reachable storage over aspirational deep ones.
-
-### The quiet luxury
-
-The calmest kitchens I have been in share something: they are not trying to impress. They have one good knife, a few honest pans, herbs by the window, and a table that has held a thousand ordinary meals.
-
-That is a kitchen designed for a life. Yours.`,
-    },
-    {
-      title: 'Lisbon in November: A Slow Itinerary',
-      slug: 'lisbon-in-november-a-slow-itinerary',
-      category: 'Travel',
-      excerpt: 'Fewer crowds, golden light, and pastel de nata still warm at nine in the morning. A five-day wander through the city.',
-      coverImage: '/uploads/post-travel.jpg',
-      coverAlt: 'Lisbon rooftops at golden hour',
-      tags: 'lisbon,portugal,slow travel,europe',
+      title: 'The History of Fluid Art',
+      slug: 'the-history-of-fluid-art',
+      category: 'Fluid Art',
+      excerpt: 'From David Alfaro Siqueiros\' accidental paintings in the 1930s to today\'s acrylic pouring craze — the surprising history of fluid art.',
+      coverImage: '/uploads/post-fluid2.jpg',
+      coverAlt: 'Historic abstract pour painting in earthy tones',
+      tags: 'fluid art,history,acrylic pouring,art history',
       featured: false,
       trending: true,
-      content: `## November is Lisbon's quiet secret
+      content: `## From accidental experiments to a global creative movement
 
-The summer crowds have gone home. The light, somehow, has stayed. It falls across the tiled facades in long amber sheets, and the city moves at the pace of a long conversation.
+When we think of fluid art, we often picture the vibrant acrylic pours flooding social media today. But the story of fluid art stretches back nearly a century, rooted in experimentation, accident and a willingness to let paint behave as paint wants to behave.
 
-I spent five days there last autumn with no plan beyond a rented flat in Alfama and a notebook. This is what I would do again.
+### The 1930s: Siqueiros and accidental painting
 
-### Day one — Arrive slowly
+The earliest documented exploration of fluid art techniques comes from Mexican muralist **David Alfaro Siqueiros** in the 1930s. Siqueiros was fascinated by the behaviour of modern industrial paints — their flow, their density, the way colours interacted when layered and poured.
 
-Resist the urge to see anything. Walk from your flat to the nearest café. Order a *bica* (espresso) and a *pastel de nata*. Eat it warm. Watch the trams climb the hill. Let the city introduce itself before you start collecting it.
+> He called it "accidental painting" — a method that embraced unpredictability rather than fighting it.
 
-### Day two — Alfama on foot
+His experiments combined elements of physics and chemistry. By layering paints of different densities, he discovered that the heavier paint would push through the lighter one, creating mesmerising cellular patterns. This was the birth of what we now call the **dirty pour**.
 
-Alfama is a neighbourhood built for being lost. Don't fight it. Climb toward the Castle of São Jorge, but stop wherever a view opens. The miradouros — Santa Luzia, das Portas do Sol — are the real destination.
+### Mid-century evolution
 
-In the evening, find a *tasca*. Not the one with the menu in five languages — the one with the day's dishes chalked on a board. Order whatever the cook recommends.
+Through the mid-20th century, a handful of abstract expressionists and experimental painters continued to explore pouring and flow techniques. **Helen Frankenthaler** pioneered her soak-stain method in the 1950s, pouring thinned oil paint onto unprimed canvas. **Morris Louis** took it further with his "veil" paintings, letting gravity and viscosity do the work.
 
-### Day three — Belém and the river
+These artists weren't making "fluid art" in the modern sense, but they were establishing the principle that paint could be poured, flowed and allowed to find its own form.
 
-Take the train to Belém. See the Jerónimos Monastery, yes, but the real pleasure is the riverside walk back toward the city. The Tagus is wide and silver here, and the light is different than on the hills.
+### The modern fluid art movement
 
-Stop at the original Pastéis de Belém. Yes, there is a queue. It moves. The nata here is subtly different — the pastry flakier, the cream barely set.
+The fluid art we recognise today — acrylic pouring with pouring medium, flip cups, swipe techniques and silicone cells — really took off in the 2010s. Several forces converged:
 
-### Day four — LX Factory and the bookshop
+- **Acrylic pouring mediums** became widely available and affordable, making paint flow predictable enough to control.
+- **Social media** — particularly Instagram and YouTube — turned the mesmerising reveal of a poured canvas into viral content.
+- **A democratising spirit** — fluid art requires no drawing skill and no formal training, welcoming complete beginners.
 
-Cross to the Alcântara district. LX Factory is a converted industrial site now full of small shops and restaurants. The highlight is Ler Devagar, a bookshop built into an old printing press, with printing presses still hanging from the ceiling.
+### Why the history matters
 
-Buy a book. Read it in the courtyard with a coffee.
+Understanding where fluid art came from reminds us that it is not a fad. It is the latest chapter in a nearly century-long exploration of what paint can do when we stop trying to control every brushstroke and let the material speak.
 
-### Day five — Sintra, if you must
-
-Sintra is beautiful and crowded in equal measure. If you go, take the early train and be at the Pena Palace by eight. Then leave by lunchtime and come back to Lisbon for a long, slow final dinner.
-
-Or skip Sintra entirely. Walk the city instead. Sit by the river. Let the last evening belong to Lisbon itself.
-
-### What I would pack
-
-- One good book of Portuguese poetry (Pessoa, obviously)
-- Shoes that can handle cobblestones
-- A notebook for the tiled doorways you will want to remember
-- Patience, for the hills`,
+The next time you flip a cup onto a canvas, you're participating in a tradition that stretches back to Siqueiros' studio in 1930s Mexico — and forward to wherever your own experiments take you.`,
     },
     {
-      title: 'A Loaf for Sunday: Sourdough Without the Anxiety',
-      slug: 'a-loaf-for-sunday-sourdough-without-the-anxiety',
-      category: 'Food',
-      excerpt: 'You do not need a microscope, a schedule, or a name for your starter. You need flour, water, time, and patience.',
-      coverImage: '/uploads/post-food.jpg',
-      coverAlt: 'A freshly baked sourdough loaf on a linen cloth',
-      tags: 'sourdough,baking,bread,recipe',
+      title: 'How to Doodle Sketch: Easy Guide for Beginners',
+      slug: 'how-to-doodle-sketch-easy-guide-for-beginners',
+      category: 'Doodle Art',
+      excerpt: 'Anyone can doodle. This beginner-friendly guide covers the supplies, the mindset and the simple steps to start doodling with confidence today.',
+      coverImage: '/uploads/post-doodle.jpg',
+      coverAlt: 'A hand doodling zentangle patterns in a sketchbook',
+      tags: 'doodle art,drawing,beginners,sketchbook',
+      featured: true,
+      trending: true,
+      content: `## Doodling is drawing without the pressure
+
+Here's the secret nobody tells you about doodling: it is not a lesser form of art. It is the most free, most playful, most forgiving kind of drawing there is. There are no rules, no mistakes, and no right way to do it. If you can hold a pen, you can doodle.
+
+### What you need to start
+
+The beauty of doodling is its simplicity. You need almost nothing:
+
+- **A pen you like.** A fine-liner (0.3mm or 0.5mm) is ideal. Gel pens, biros and felt-tips all work.
+- **Any paper.** A cheap sketchbook, a notebook, the corner of a receipt. Doodling doesn't demand fancy materials.
+- **That's it.** No eraser — doodling is about committing to the line, not correcting it.
+
+### The mindset
+
+Before you draw a single line, let go of the idea that your doodle has to look like anything. Doodling is pattern-making. It's repetition. It's the meditative act of putting one mark next to another and seeing what happens.
+
+> A doodle is not a drawing of something. A doodle is a record of attention.
+
+### Five simple steps
+
+1. **Warm up with lines.** Fill a corner of your page with straight lines, then wavy lines, then circles. Get your hand moving.
+2. **Pick a simple shape.** A circle, a square, a leaf. Draw it once. Then draw it again, slightly different. Then again.
+3. **Repeat and vary.** Take your shape and repeat it across the page, changing the size or rotation each time. Let a pattern emerge.
+4. **Add detail.** Inside one of your shapes, add smaller shapes — dots, lines, hatching. This is where zentangle-style patterns begin.
+5. **Keep going.** Don't stop to judge. Fill the page. The magic of doodling happens in the doing, not the planning.
+
+### Easy patterns to try
+
+- **Lines and dots** — alternating rows, building texture.
+- **Spirals** — tight and loose, single and nested.
+- **Scallops** — repeated semicircles, like fish scales.
+- **Hatching** — parallel lines that get closer together to create shade.
+- **Bubbles** — overlapping circles of different sizes.
+
+### A daily practice
+
+Keep your sketchbook somewhere visible. Doodle for five minutes with your morning tea, or while on a call. The goal is not to make a masterpiece — it is to keep your hand and your eye in the habit of making marks.
+
+Within a week, you'll notice your lines becoming more confident. Within a month, you'll have a sketchbook full of patterns you didn't know you had in you. That's the quiet power of the doodle.`,
+    },
+    {
+      title: '17 Creative Pencil Art Drawings to Boost Your Imagination',
+      slug: '17-creative-pencil-art-drawings-to-boost-your-imagination',
+      category: 'Drawing',
+      excerpt: 'Stuck for what to draw? These 17 creative pencil art ideas will spark your imagination — from realistic textures to surreal compositions.',
+      coverImage: '/uploads/post-pencil.jpg',
+      coverAlt: 'A detailed pencil drawing with shading and texture',
+      tags: 'pencil art,drawing,sketching,ideas',
+      featured: true,
+      trending: false,
+      content: `## Pick up a pencil and let your imagination loose
+
+There is something deeply satisfying about a pencil. No batteries, no charging, no undo button — just graphite, paper and your hand. If you've been staring at a blank page waiting for inspiration, here are seventeen ideas to get your pencil moving again.
+
+### Nature & texture
+
+1. **A single leaf, drawn from life.** Pay attention to the veins and the way light catches the edge.
+2. **Tree bark close-up.** A study in texture — use hatching and cross-hatching to suggest roughness.
+3. **A wave, mid-break.** Capture the curl and the foam with soft pencil work and a kneaded eraser for highlights.
+4. **A feather.** Practice delicate, directional strokes following the barbs.
+
+### People & faces
+
+5. **A self-portrait, blind contour.** Draw without looking at the paper. It will be wrong, and that's the point.
+6. **Hands in different positions.** Hands are notoriously hard — the only way to learn them is to draw them, a lot.
+7. **An elderly face.** Wrinkles are wonderful practice for shading and for understanding form.
+8. **A profile in shadow.** Draw a face lit from one side, focusing only on the shadow shapes.
+
+### Objects & still life
+
+9. **A crumpled piece of paper.** All those folds and cast shadows are a masterclass in value.
+10. **A glass of water.** Refraction, reflection, transparency — a deceptively simple subject that teaches a lot.
+11. **Your keys.** Everyday objects drawn carefully become interesting.
+12. **A stack of books.** Practice perspective and overlapping forms.
+
+### Imaginative & surreal
+
+13. **A landscape from memory.** Don't use a reference — draw a place you remember and notice what your mind keeps and what it loses.
+14. **A hybrid animal.** Combine two creatures and see what emerges.
+15. **A door in the middle of a forest.** Tell a small story with a single image.
+16. **A teacup with legs.** Absurd, yes — but playful drawing loosens up your hand and your imagination.
+17. **A pattern made entirely of tiny repeated objects.** Stars, fish, leaves — let it grow organically across the page.
+
+### How to get the most out of these
+
+Don't spend more than 20 minutes on any one. The point is quantity over perfection — the more you draw, the more your hand learns. Date each one. Come back in a month and notice how much your eye has sharpened.
+
+The pencil is the most patient teacher you will ever have. It waits for you to pick it up. So pick it up.`,
+    },
+    {
+      title: '15 Posca Marker Art Ideas: Vibrant Techniques for Eye-Catching Designs',
+      slug: '15-posca-marker-art-ideas-vibrant-techniques',
+      category: 'Posca Art',
+      excerpt: 'Posca markers are paint in a pen — opaque, vivid and endlessly versatile. Here are 15 ideas to make the most of them on canvas, paper and more.',
+      coverImage: '/uploads/post-posca.jpg',
+      coverAlt: 'A vibrant posca marker painting with bold colours',
+      tags: 'posca art,markers,painting,ideas',
+      featured: false,
+      trending: true,
+      content: `## Paint in a pen — the joy of Posca markers
+
+Posca markers are unlike any other art supply. They are opaque acrylic paint in a pen, which means you can layer light over dark, paint on almost any surface, and get the vibrancy of acrylics with the control of a marker. Once you try them, it's hard to go back.
+
+### Why Posca?
+
+- **Opaque coverage** — you can paint white over black, no problem.
+- **Work on any surface** — canvas, paper, wood, glass, metal, fabric, stone.
+- **Mix like paint** — blend wet-on-wet, or layer once dry.
+- **Archival quality** — lightfast and permanent when dry.
+
+### 15 ideas to spark your next piece
+
+**For canvas and wall art:**
+
+1. **Botanical prints** — bold leaves and flowers in flat colour blocks.
+2. **Geometric compositions** — overlapping shapes in a limited palette.
+3. **Mandala-style pieces** — symmetrical patterns built from the centre out.
+4. **Typography art** — a favourite quote, hand-lettered and decorated.
+5. **Portrait in flat colour** — simplify a face into shapes and shadows.
+
+**For everyday objects:**
+
+6. **Customise a skateboard deck** — Posca was made for this.
+7. **Paint a terracotta pot** — seal it afterwards and it lasts for years.
+8. **Decorate a notebook cover** — your sketchbook deserves its own art.
+9. **Glass bottles and jars** — turn recycling into vases.
+10. **Sneakers** — yes, really. Posca on canvas shoes, sealed, survives wear.
+
+**For paper and sketchbook:**
+
+11. **A colourful landscape** — flat, stylised, almost like a print.
+12. **Abstract florals** — loose, flowing, layered petals.
+13. **Comic-style panels** — Posca's opacity is perfect for bold comic art.
+14. **Patterned gift wrap** — paint on kraft paper for one-of-a-kind wrapping.
+15. **A daily colour study** — one small abstract square a day.
+
+### Techniques to try
+
+- **Stippling** — building tone from dots of colour.
+- **Layering** — let each layer dry fully before the next for crisp edges.
+- **Wet blending** — work quickly while the paint is still fluid.
+- **Sgraffito** — paint a layer, let it dry, paint another, then scratch through to reveal the colour beneath.
+
+### A note on sealing
+
+Posca is permanent on porous surfaces but can scuff on glass, metal or sealed wood. A light spray of acrylic varnish or mod podge will protect your work for years.
+
+Pick up a pen, pick a colour, and start. Posca forgives almost everything — you can paint over any mistake.`,
+    },
+    {
+      title: 'Top 10 Polymer Clay Artists Making Unique Handmade Creations',
+      slug: 'top-10-polymer-clay-artists-unique-handmade-creations',
+      category: 'Clay Art',
+      excerpt: 'Polymer clay has become a medium for extraordinary art. Meet ten artists pushing the boundaries of what this humble material can do.',
+      coverImage: '/uploads/post-clay.jpg',
+      coverAlt: 'Detailed polymer clay sculptures and handmade creations',
+      tags: 'polymer clay,clay art,artists,handmade',
       featured: false,
       trending: false,
-      content: `## Sourdough has become a performance
+      content: `## A humble material, elevated to art
 
-Somewhere between the pandemic and the proliferation of crumb-shot Instagram accounts, sourdough turned into a hobby for people who enjoy stress. Bakers began speaking of hydration percentages and starter feeding schedules as if they were managing a small nuclear reactor.
+Polymer clay is one of the most accessible art materials on earth. A block costs a few pounds, it cures in a home oven, and it can mimic everything from porcelain to stone to glass. In the hands of a skilled artist, it becomes something extraordinary.
 
-It does not have to be this way. Bread is one of the oldest things humans make. It forgives a great deal.
+These ten artists — working across jewellery, sculpture, illustration and beyond — show just how far polymer clay can go.
 
-### The only equipment that matters
+### The artists
 
-- A digital scale. Not a measuring cup. Bread is not a place for guessing.
-- A Dutch oven. The steam it traps is what gives you the crust.
-- A bowl. A hand. Time.
+1. **The miniaturist** — creating impossibly small, impossibly detailed food and everyday objects, each no bigger than a fingernail.
+2. **The botanical sculptor** — leaves, buds and blooms so lifelike you expect them to wilt.
+3. **The cane-work master** — building complex millefiori patterns that reveal themselves only when the clay is sliced.
+4. **The portrait artist** — relief portraits in clay, capturing expression in shallow three dimensions.
+5. **The jewellery innovator** — bold, architectural wearable pieces that read more like small sculptures than accessories.
+6. **The texture experimentalist** — pressing fabric, lace, bark and stone into clay to create surfaces that beg to be touched.
+7. **The faux-stone specialist** — mixing clays and pigments to mimic turquoise, jade, coral and agate.
+8. **The character sculptor** — whimsical creatures with personality, each one a small story.
+9. **The mosaic maker** — slicing canes into tiles and assembling them into larger images.
+10. **The vessels artist** — thin-walled bowls and pots, often translucent, that elevate polymer clay to fine ceramics.
 
-That is all.
+### What we can learn from them
 
-### The loaf
+Across these ten very different practices, a few things stand out:
 
-This makes one loaf. It takes most of a day, but most of that day is waiting.
+- **Mastery of the basics.** Every one of these artists has spent years conditioning, rolling and curing clay. The fundamentals make the art possible.
+- **A signature material conversation.** Each has found a specific way of working — a texture, a colour palette, a technique — that is recognisably theirs.
+- **Willingness to fail.** Polymer clay is cheap enough to experiment with, and these artists do. The breakthroughs come from the failures.
 
-**Levain** — 20g mature starter, 100g water, 100g flour. Leave 4–5 hours until bubbly and doubled.
+### How to start yourself
 
-**Dough** — 350g water, 500g bread flour, 10g fine salt, all of the levain.
+You don't need a studio. You need a block of clay, a smooth work surface, a blade or craft knife, and an oven. Condition the clay thoroughly (the single biggest beginner mistake is under-conditioning), start simple, and let yourself make ugly things on the way to making beautiful ones.
 
-1. Mix water and levain. Add flour and salt. Mix until no dry flour. Rest 30 minutes.
-2. Over the next 2 hours, do four "stretch and folds" — 30 minutes apart. Grab a handful of dough, stretch it up, fold it over. Rotate. Repeat four times. That is one set.
-3. After the last fold, let the dough rise until it is puffy and about 50% larger — 2 to 4 hours, depending on your kitchen.
-4. Shape into a round. Place in a floured bowl, seam up. Cover. Refrigerate overnight.
-5. Next morning: heat the Dutch oven to 250°C (480°F) for an hour.
-6. Turn the dough onto parchment, score it with a sharp knife, lower it into the hot pot. Lid on. Bake 20 minutes.
-7. Lid off. Bake 20–25 minutes more, until deep amber.
-8. Cool completely. *Completely.* This is the hardest step.
-
-### The crumb will not always be perfect
-
-Sometimes it is tight. Sometimes it is uneven. It will still be the best bread you have eaten all week, because you made it, and because bread that is two hours old is simply a different food than bread that is two days old.
-
-Feed the starter. Forget about it for a few days. It will be fine. So will you.`,
+The artists above all started exactly where you are now — with a block of clay and a question: *what can I make with this?*`,
     },
     {
-      title: 'On Reading Slowly: The Books That Ask to Be Lingered Over',
-      slug: 'on-reading-slowly-the-books-that-ask-to-be-lingered-over',
-      category: 'Culture',
-      excerpt: 'In an age of finish-the-book productivity, the case for reading the same novel twice — and the writers who reward it.',
+      title: 'Best Paint for Air Dry Clay: Keeping Sculptures Crack-Free',
+      slug: 'best-paint-for-air-dry-clay-keeping-sculptures-crack-free',
+      category: 'Clay Art',
+      excerpt: 'Painting air dry clay seems simple until your sculpture cracks or the paint flakes. Here is how to choose the right paint — and how to apply it.',
+      coverImage: '/uploads/post-clay2.jpg',
+      coverAlt: 'A painted air dry clay sculpture with smooth finish',
+      tags: 'air dry clay,painting,clay art,tutorial',
+      featured: false,
+      trending: false,
+      content: `## The right paint makes all the difference
+
+Air dry clay is wonderfully easy to work with — no kiln, no oven, no special equipment. But once your sculpture is dry, the question becomes: what do I paint it with? The wrong choice leads to flaking, cracking or a finish that never quite looks right.
+
+### Why air dry clay is tricky to paint
+
+Air dry clay is porous. It absorbs water from acrylic paint, which can cause the surface to soften and the paint to sink in unevenly. If your sculpture has any remaining moisture inside, painting over it traps that moisture and leads to cracks weeks later.
+
+The solution is a simple three-stage process: **dry, seal, paint.**
+
+### Step 1: Dry thoroughly
+
+This is the step everyone rushes. A small sculpture needs at least 48 hours; a larger one can take a week or more. The clay should be uniformly light in colour and cool to the touch (not slightly damp) before you even think about painting.
+
+> If in doubt, wait another day. There is no such thing as over-drying air dry clay.
+
+### Step 2: Seal the surface
+
+Before painting, apply a thin coat of **acrylic gesso** or a dedicated **clay sealer**. This creates a barrier between the porous clay and your paint, preventing absorption and giving the paint something to grip. One or two thin coats are better than one thick one.
+
+### Step 3: Choose the right paint
+
+**Acrylic paint** is the gold standard for air dry clay. It is water-based (so it won't react with the clay), flexible (so it moves with any tiny shifts in the sculpture), and available in an enormous range of colours.
+
+- **Student-grade acrylics** are fine for practice pieces.
+- **Artist-grade acrylics** have more pigment and give a richer, more archival finish.
+- **Heavy body acrylics** are good if you want visible brush texture.
+- **Fluid acrylics** are better for smooth, even coverage.
+
+Avoid oil paint (it never fully cures on porous clay and can bleed), and avoid watercolour (it will absorb unevenly and look patchy).
+
+### Step 4: Finish and protect
+
+Once your paint is fully dry, apply a **varnish** to protect the surface. A matte varnish gives a natural, ceramic-like finish; a gloss varnish makes colours pop and mimics glazed pottery. Two thin coats, brushed or sprayed, are usually enough.
+
+### Quick troubleshooting
+
+- **Cracks appearing days later** — the clay wasn't fully dry before painting.
+- **Paint peeling in sheets** — the surface wasn't sealed, or the paint was applied too thickly.
+- **Patchy colour** — the clay absorbed the paint unevenly; seal first.
+- **Dull finish** — add a varnish; raw acrylic is naturally slightly matte.
+
+Treat air dry clay with this simple process and your sculptures will stay smooth, vibrant and crack-free for years.`,
+    },
+    {
+      title: 'Resin Art and Epoxy Techniques: A Beginner\'s Guide',
+      slug: 'resin-art-and-epoxy-techniques-beginners-guide',
+      category: 'Resin Art',
+      excerpt: 'Glossy, glass-like and endlessly versatile — resin art is addictive. Here is everything a beginner needs to know to pour safely and beautifully.',
+      coverImage: '/uploads/post-resin.jpg',
+      coverAlt: 'A glossy resin art piece with embedded pigments',
+      tags: 'resin art,epoxy,beginners,tutorial',
+      featured: false,
+      trending: true,
+      content: `## Glossy, glass-like and endlessly versatile
+
+There is nothing quite like the finish of cured resin — a deep, glassy surface that makes colours glow and turns a flat piece of art into something you want to reach out and touch. Resin art is addictive, but it does demand respect. Get the basics right and the results are extraordinary.
+
+### What is epoxy resin?
+
+Epoxy resin is a two-part liquid — a resin and a hardener — that, when mixed in the correct ratio, chemically react to form a solid, glossy plastic. For art, you want a **casting or coating resin** formulated for creative use: low-odour, UV-resistant and slow-curing (which gives you time to work).
+
+### Safety first — non-negotiable
+
+Resin is safe to work with if you take precautions, and harmful if you don't.
+
+- **Wear nitrile gloves** for every pour.
+- **Work in a well-ventilated space** — a window open, or a respirator if you pour often.
+- **Protect your surfaces** — resin does not come off easily.
+- **Keep food and drink away** from your work area.
+
+### What you need to start
+
+- **Epoxy resin kit** (resin + hardener, pre-measured)
+- **Mixing cups** — clear, with measurement marks
+- **Stir sticks** — wooden, flat
+- **Pigments** — resin dye, mica powder or alcohol ink
+- **A torch or heat gun** — for popping bubbles
+- **A level surface** — resin self-levels, so a level surface matters
+- **A dust cover** — a box or tent to keep dust off while curing
+
+### The basic pour
+
+1. **Measure precisely.** Most kits are a 1:1 ratio by volume. Measure exactly — off-ratio resin stays tacky forever.
+2. **Mix slowly.** Stir for the full time recommended (usually 2–3 minutes), scraping the sides and bottom. Incomplete mixing causes sticky patches.
+3. **Split and colour.** Divide into smaller cups and add pigment. A little goes a long way.
+4. **Pour.** Layer colours directly onto your surface, or dirty-pour them together first.
+5. **Torch the bubbles.** A quick pass with a flame pops surface bubbles instantly. Don't linger.
+6. **Cover and cure.** Most resins are touch-dry in 24 hours and fully cured in 72.
+
+### Techniques to explore
+
+- **Geode coasters** — layering pigmented resin in concentric rings, finished with gold leaf.
+- **Ocean art** — blue and white resin, swirled with a heat gun to create realistic waves and foam.
+- **Petal pours** — dropping individual colours into a clear base for a stained-glass effect.
+- **Resin and wood** — pouring into a live-edge slab for a river-table look on a small scale.
+
+### A beginner's first three pieces
+
+Start small and cheap. Coasters and small tiles are perfect — they use little resin, cure fast, and teach you everything: mixing, colouring, torching and finishing. By your third pour, you'll be ready for a bigger piece.
+
+Resin rewards patience and punishes haste. Measure carefully, mix thoroughly, and let it do what it does. The reveal — peeling back the dust cover the next morning — is one of the best feelings in art.`,
+    },
+    {
+      title: 'Famous Artists Who Changed the Art World Forever',
+      slug: 'famous-artists-who-changed-the-art-world-forever',
+      category: 'Art Culture',
+      excerpt: 'A handful of artists didn\'t just make great work — they changed what art could be. Here are ten who reshaped the art world permanently.',
       coverImage: '/uploads/post-culture.jpg',
-      coverAlt: 'A stack of well-thumbed books by a lamp',
-      tags: 'reading,books,literature',
+      coverAlt: 'A gallery wall of famous artworks through history',
+      tags: 'famous artists,art history,art culture',
       featured: false,
       trending: false,
-      content: `## We have turned reading into a metric
+      content: `## The artists who bent the course of art
 
-Pages per night. Books per year. A spreadsheet of titles conquered. The reading apps encourage it; the reading challenges gamify it. Somewhere along the way, finishing became the point.
+Most artists make work within the traditions they inherit. A rare few break those traditions open and force the next generation to start somewhere new. This is a small tour of ten such artists — not the "greatest" necessarily, but the ones whose work sent the whole conversation of art off in a new direction.
 
-But finishing was never the point. Reading was.
+### The Renaissance shift
 
-### Some books are not meant to be finished
+**Leonardo da Vinci** did not invent painting, but he reinvented what a painter could be — part scientist, part engineer, part philosopher. His obsessive studies of anatomy, light and optics fed directly into work that still feels impossibly alive five centuries later.
 
-There is a particular kind of book that resists being consumed — that asks to be read a page at a time, sometimes a sentence at a time, and then put down so the thought can be carried through the day. These books are not difficult for the sake of it. They are dense because they are full.
+### Light, atmosphere and the everyday
 
-I am thinking of Marilynne Robinson's *Gilead*, which is a letter from a dying father to his young son, and which I have read three times and will read again. Of Annie Dillard's *Pilgrim at Tinker Creek*, which is best read one chapter a week, like a season. Of the essays of Robert Macfarlane, which describe landscapes so specifically that to read them quickly is to miss the terrain.
+**Caravaggio** brought theatre to painting with extreme chiaroscuro — figures emerging from darkness as if lit by a single candle. His influence on every painter of light who followed is impossible to overstate.
 
-### The case for re-reading
+**Vermeer** took the opposite path: quiet, domestic, luminous. He proved that a single room, a single figure, a single shaft of light could carry the weight of a painting.
 
-The first time you read a novel, you read for plot. The second time, freed from the question of *what happens*, you finally see *how it is happening* — the architecture, the echoes, the quiet foreshadowing you missed because you were in a hurry to find out.
+### The break from realism
 
-Re-reading is not a failure of discovery. It is a deeper kind.
+**Claude Monet** and the Impressionists were the first group to insist that a painting could be about *the act of seeing* rather than the thing being seen. Once that door was open, art could never go back.
 
-### A slow reading practice
+**Vincent van Gogh** painted emotion into every brushstroke. His work was not celebrated in his lifetime, but it became the bridge between Impressionism and Expressionism.
 
-- Keep one "slow book" going at all times, alongside whatever you are reading for momentum.
-- Read it for ten minutes in the morning, not forty at night. Fresh attention matters more than duration.
-- Mark passages. Not to remember them — to return to them.
-- Allow yourself to abandon a book that does not earn its pages. Life is short and the library is vast.
+### The 20th century
 
-### What I am re-reading this autumn
+**Pablo Picasso** did not rest in any style for long. Alongside Braque he invented Cubism, which shattered the single-point perspective that had ruled Western art since the Renaissance.
 
-- *Gilead*, Marilynne Robinson
-- *The Beauty of Everyday Things*, Soetsu Yanagi
-- *A Field Guide to Getting Lost*, Rebecca Solnit
+**Marcel Duchamp** asked the question that haunted the 20th century: *what counts as art?* A urinal, signed and placed in a gallery, did more to expand the definition of art than any painting of the era.
 
-Each is a book that gives more the second time than the first. Each asks only that you slow down enough to hear it.`,
+**Frida Kahlo** painted her own body, her own pain, her own identity with a directness that prefigured the confessional art of decades to come. She proved that the personal could be universal.
+
+### Contemporary echoes
+
+**Yayoi Kusama** turned obsession into immersive environment — rooms of mirrors and polka dots that dissolve the boundary between viewer and artwork. Her work reshaped what an art experience could be.
+
+**Jean-Michel Basquiat** brought the energy of the street, of graffiti, of hip-hop into the gallery, and in doing so forced the art world to confront who it had been excluding.
+
+### What they share
+
+These artists did not set out to be revolutionary. They set out to make the work only they could make, using the tools available to them. The revolution was a side effect of honesty.
+
+If there is a lesson for the rest of us — for the fluid artists, the doodlers, the polymer clay sculptors — it is that the most meaningful breakthroughs come not from trying to change the world, but from refusing to make work that isn't truly yours.`,
     },
     {
-      title: 'The Considered Wardrobe: Ten Pieces, Endless Outfits',
-      slug: 'the-considered-wardrobe-ten-pieces-endless-outfits',
-      category: 'Style',
-      excerpt: 'A small wardrobe is not about deprivation. It is about knowing yourself well enough to stop buying the wrong things.',
-      coverImage: '/uploads/post-style.jpg',
-      coverAlt: 'A neatly arranged capsule wardrobe',
-      tags: 'capsule wardrobe,style,minimalism',
+      title: 'How to Start a Doodle Journal: 30+ Easy Page Ideas for Beginners',
+      slug: 'how-to-start-a-doodle-journal-30-easy-page-ideas',
+      category: 'Doodle Art',
+      excerpt: 'A doodle journal is part sketchbook, part diary, part meditation. Here is how to start one — plus 30+ easy page ideas to fill it.',
+      coverImage: '/uploads/post-doodle2.jpg',
+      coverAlt: 'An open doodle journal filled with patterns and ideas',
+      tags: 'doodle art,journal,sketchbook,beginners',
       featured: false,
       trending: false,
-      content: `## The closet is full, but there is nothing to wear
+      content: `## Part sketchbook, part diary, part meditation
 
-It is the oldest complaint, and it is almost always a symptom of the same problem: too many clothes that are almost right, and not enough that are exactly right.
+A doodle journal is the most forgiving art practice I know. It is not a sketchbook in the traditional sense — there is no expectation of a finished drawing, no pressure to produce something frame-worthy. It is simply a place to put your pen down and see what happens, a few minutes at a time.
 
-A considered wardrobe is not a minimalist aesthetic. It is not a colour palette or a rule about thirty-three items. It is simply a wardrobe where everything fits the life you have, flatters the body you are in, and works with everything else.
+### Why keep one
 
-### Start with the question
+- It builds a daily creative habit without demanding much time.
+- It is a record of where your attention was, day by day.
+- It loosens your hand for every other kind of art you make.
+- It is genuinely calming — doodling lowers stress in measurable ways.
 
-Before you buy anything, ask: *does this work with at least three things I already own and wear?* If the answer is no, it does not matter how beautiful it is, or how good the sale is. It will become the eleventh piece that goes with nothing.
+### What you need
 
-### Ten pieces that carry a season
+A notebook you don't mind "ruining", and a pen. That is the whole kit. I prefer a dot-grid notebook because the dots give a subtle structure without the tyranny of lines, but any notebook works. Avoid erasable pens — a doodle journal is about committing to the mark.
 
-This is not a prescription. It is a demonstration of how little you need when everything works together.
+### How to start a page
 
-1. A well-cut white shirt
-2. A navy or charcoal crewneck sweater
-3. Straight-leg trousers in a neutral
-4. A midi skirt that moves
-5. A blazer that fits the shoulders
-6. A trench or wool coat
-7. Leather ankle boots
-8. White leather sneakers
-9. A simple silk or cotton scarf
-10. One piece of good everyday jewellery
+Don't begin with a plan. Begin with a mark. A single line, a circle, a dot. Then add another mark next to it. Then another. Let the page tell you what it wants to be. If you fill a corner and stop, that's a complete page. If you fill the whole thing, that's also a complete page.
 
-Everything here is neutral enough to mix, and none of it is so precious it cannot be lived in. The variety comes from how you combine them — tuck the shirt, layer the sweater over the skirt, add the scarf, change the shoes.
+### 30+ page ideas
 
-### Buy fewer, buy better
+**Patterns (10)**
+1. A grid of tiny circles, each filled with a different texture.
+2. Concentric squares, like a tunnel.
+3. A wave pattern that fills the whole page.
+4. Repeated leaves along a curving stem.
+5. A spiral of dots, getting denser toward the centre.
+6. Scalloped rows, like fish scales.
+7. A checkerboard where each square holds a different pattern.
+8. Hatched lines forming a gradient from light to dark.
+9. A web of connecting lines and nodes.
+10. A single shape repeated at different scales.
 
-The economics of a considered wardrobe are simple. One good coat, worn for ten winters, costs less per wear than three cheap coats worn for two seasons each. The same is true of shoes, of jeans, of the white shirt that holds its shape after fifty washes.
+**Observational (8)**
+11. The view from your window, simplified.
+12. Your morning coffee cup.
+13. The objects on your desk.
+14. A plant, leaf by leaf.
+15. Your own hand, blind contour.
+16. The shoes you wore today.
+17. A meal you ate.
+18. The sky at a specific moment.
 
-This is not about spending more. It is about spending once.
+**Reflective (7)**
+19. A word that mattered today, decorated.
+20. Three things you're grateful for, drawn as small icons.
+21. A feeling, expressed only in shapes.
+22. A map of your day — where you went, in symbols.
+23. A quote, hand-lettered and surrounded by pattern.
+24. A weather report, drawn.
+25. Something you're working through, drawn as a metaphor.
 
-### The freedom of enough
+**Playful (6)**
+26. A monster with too many eyes.
+27. A door in the middle of nowhere.
+28. A hybrid of two animals.
+29. A pattern made of your initials.
+30. A landscape that could not exist.
+31. A tiny world inside a teacup.
 
-When the closet is full of things you love and that work together, getting dressed stops being a problem. You stop standing in front of it each morning negotiating. You simply reach, and the outfit assembles itself, because everything in there was chosen on purpose.
+### A gentle rule
 
-That is the quiet luxury of a considered wardrobe. Not the look of it — the ease.`,
+The only rule of a doodle journal is: **don't tear pages out.** The "bad" pages are part of the practice. They are evidence that you showed up. Keep them. In a year, you'll be glad you did.
+
+Start tonight. Five minutes. One mark. See where it goes.`,
     },
   ]
 
@@ -362,14 +627,14 @@ That is the quiet luxury of a considered wardrobe. Not the look of it — the ea
         status: 'PUBLISHED',
         categoryId: categoryMap[p.category].id,
         authorId: admin!.id,
-        publishedAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 86400000),
-        views: Math.floor(Math.random() * 4000) + 200,
-        likes: Math.floor(Math.random() * 200) + 10,
+        publishedAt: new Date(Date.now() - Math.floor(Math.random() * 60) * 86400000),
+        views: Math.floor(Math.random() * 8000) + 500,
+        likes: Math.floor(Math.random() * 400) + 20,
       },
     })
   }
 
-  console.log('Seed complete. Setting id:', setting.id)
+  console.log('Seed complete with Christine Britton content.')
 }
 
 main()

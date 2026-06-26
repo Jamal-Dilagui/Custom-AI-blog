@@ -18,31 +18,31 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Lumen Journal — Stories, ideas & thoughtful living",
+  title: "Christine Britton — Fluid Art, Resin Art & Creative Drawing Tutorials",
   description:
-    "An independent editorial magazine exploring wellness, home, travel, food and culture. Thoughtful writing for curious minds.",
+    "Fluid art, resin art, doodle drawing and creative tutorials from a lifelong artist on the West coast of Scotland. Explore acrylic pouring, dutch pours, posca art, polymer clay and more.",
   keywords: [
-    "lifestyle magazine",
-    "wellness",
-    "slow living",
-    "home",
-    "travel",
-    "food",
-    "culture",
-    "editorial blog",
+    "fluid art",
+    "acrylic pouring",
+    "resin art",
+    "doodle art",
+    "posca art",
+    "polymer clay",
+    "drawing tutorials",
+    "Christine Britton",
   ],
-  authors: [{ name: "Lumen Journal" }],
+  authors: [{ name: "Christine Britton" }],
   openGraph: {
-    title: "Lumen Journal — Stories, ideas & thoughtful living",
+    title: "Christine Britton — Fluid Art, Resin Art & Creative Drawing Tutorials",
     description:
-      "An independent editorial magazine exploring wellness, home, travel, food and culture.",
-    siteName: "Lumen Journal",
+      "Fluid art, resin art, doodle drawing and creative tutorials from a lifelong artist on the West coast of Scotland.",
+    siteName: "Christine Britton",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lumen Journal",
-    description: "Stories, ideas & thoughtful living",
+    title: "Christine Britton",
+    description: "Fluid art, resin art & creative drawing tutorials",
   },
 };
 
