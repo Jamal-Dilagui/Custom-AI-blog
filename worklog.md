@@ -131,3 +131,31 @@ Stage Summary:
 - Professional typography: fluid type scale, antialiased rendering, proper line heights.
 - Mobile UX: 16px inputs (no iOS zoom), touch-action manipulation, no horizontal scroll, horizontal-scrolling category bar, proper stacking of all grids and sidebars.
 - No console/runtime errors, ESLint clean.
+
+---
+Task ID: 50-55
+Agent: main (Z.ai Code)
+Task: Move affiliate links inline inside post content (like reference image) and add HTML code insertion to post editor.
+
+Work Log:
+- Analyzed reference image: affiliate product cards shown as a row of vertical cards (image on top, title, "Check Price" button) inserted BETWEEN paragraphs inside the article content — not as a separate section at the bottom.
+- Installed `rehype-raw` package to enable raw HTML rendering inside react-markdown.
+- Updated Markdown component to use `rehypePlugins={[rehypeRaw]}` so admin-inserted HTML renders inline within the markdown content.
+- Added comprehensive CSS styles for inline affiliate product cards in globals.css: `.affiliate-cards` wrapper (flex row, centered, subtle background), `.product-card` (vertical card with image on top, title, price, footer with affiliate label + pill button), responsive mobile layout (cards stack and switch to horizontal image-left layout under 640px).
+- Built `insert-dialogs.tsx` with two components:
+  - `InsertHtmlDialog`: dialog with a textarea for pasting raw HTML, shows available CSS classes reference, inserts at cursor position.
+  - `InsertAffiliateDialog`: dialog listing the post's affiliate links with checkboxes, generates styled HTML card row from selected products, shows live HTML preview, inserts at cursor position.
+  - `generateAffiliateCardsHTML` helper: generates the `<div class="affiliate-cards">` HTML block from AffiliateLink objects with proper escaping.
+- Updated PostEditor: added `contentRef` for the content textarea, `insertAtCursor` function that inserts text at the cursor position with proper newline padding, added "Affiliate" and "HTML" buttons to the content toolbar (alongside "AI Image"), wired both dialogs to the insertAtCursor function.
+- Updated PostView (public): replaced the large separate "Recommended supplies" section at the bottom with a slim one-line affiliate disclosure notice (for FTC/legal compliance) since the actual product cards are now inline in the content.
+- Removed unused Package/ExternalLink imports from post-view.
+- Verified end-to-end with Agent Browser: opened admin → new article → added an affiliate link (Nicpro Acrylic Paint Set) → typed content → clicked "Affiliate" toolbar button → selected the product → HTML card block inserted at cursor position → saved as draft → published via API → viewed on public site → confirmed 1 `.affiliate-cards` div with 1 `.product-card` rendering inline inside the article prose (showing product title, price, affiliate label, and "Check price" button).
+- Also verified "Insert HTML" dialog opens correctly.
+- Cleaned up test post.
+
+Stage Summary:
+- Affiliate product cards now render INLINE within the article content (between paragraphs) matching the reference image — vertical cards with image on top, title, price, "Check Price" pill button, arranged in a responsive row.
+- Post editor has two new toolbar buttons: "HTML" (paste any raw HTML) and "Affiliate" (select from the post's affiliate links to auto-generate a styled card row). Both insert at the cursor position.
+- Markdown renderer now supports raw HTML via rehype-raw, so any HTML the admin inserts renders correctly.
+- Responsive: cards stack vertically on mobile with a horizontal image-left layout for better mobile UX.
+- ESLint clean, all features browser-verified.

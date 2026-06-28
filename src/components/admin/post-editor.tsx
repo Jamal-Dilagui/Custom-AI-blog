@@ -16,10 +16,12 @@ import { Markdown } from '@/components/site/markdown'
 import { Metabox } from './metabox'
 import { AffiliateLinksEditor } from './affiliate-links-editor'
 import { GenerateImageDialog } from './generate-image-dialog'
+import { InsertHtmlDialog, InsertAffiliateDialog } from './insert-dialogs'
 import {
   ArrowLeft, Save, Eye, Upload, ImageIcon, Loader2, Sparkles, Send, Clock,
   Calendar, Tag, FolderTree, Image as ImgIcon, FileText, Search, ShoppingCart,
   Settings as SettingsIcon, Wand2, Link2, Check, AlertCircle, Eye as EyeIcon,
+  Code2,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { slugify, excerptFromContent, estimateReadTime } from '@/lib/helpers'
@@ -58,9 +60,34 @@ export function PostEditor({ postId }: { postId: string | null }) {
   const [showMedia, setShowMedia] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [showGenerator, setShowGenerator] = useState(false)
+  const [showHtmlDialog, setShowHtmlDialog] = useState(false)
+  const [showAffiliateDialog, setShowAffiliateDialog] = useState(false)
   const [form, setForm] = useState<EditorState>(BLANK)
   const fileRef = useRef<HTMLInputElement>(null)
   const slugTouched = useRef(false)
+  const contentRef = useRef<HTMLTextAreaElement>(null)
+
+  // Insert text at the cursor position in the content textarea
+  const insertAtCursor = (text: string) => {
+    const ta = contentRef.current
+    if (!ta) {
+      update({ content: form.content + '\n\n' + text })
+      return
+    }
+    const start = ta.selectionStart
+    const end = ta.selectionEnd
+    const before = form.content.slice(0, start)
+    const after = form.content.slice(end)
+    const insert = (before.endsWith('\n') || before === '' ? '' : '\n\n') + text + '\n\n'
+    const newContent = before + insert + after
+    update({ content: newContent })
+    // Restore cursor position after the inserted text
+    requestAnimationFrame(() => {
+      ta.focus()
+      const pos = (start + insert.length) as number
+      ta.setSelectionRange(pos, pos)
+    })
+  }
 
   useEffect(() => {
     let active = true
@@ -249,12 +276,18 @@ export function PostEditor({ postId }: { postId: string | null }) {
                 <span className="text-sm font-medium">Content</span>
                 <span className="text-xs text-muted-foreground">· Markdown</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span>{wordCount} words</span>
-                <span>·</span>
-                <span>{estimateReadTime(form.content)} min read</span>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                <span className="hidden sm:inline">{wordCount} words</span>
+                <span className="hidden sm:inline">·</span>
+                <span className="hidden sm:inline">{estimateReadTime(form.content)} min read</span>
                 <Button variant="ghost" size="sm" className="h-7" onClick={() => setShowGenerator(true)}>
                   <Wand2 className="h-3.5 w-3.5 mr-1 text-primary" /> AI Image
+                </Button>
+                <Button variant="ghost" size="sm" className="h-7" onClick={() => setShowAffiliateDialog(true)} disabled={form.affiliateLinks.length === 0}>
+                  <ShoppingCart className="h-3.5 w-3.5 mr-1 text-primary" /> Affiliate
+                </Button>
+                <Button variant="ghost" size="sm" className="h-7" onClick={() => setShowHtmlDialog(true)}>
+                  <Code2 className="h-3.5 w-3.5 mr-1 text-primary" /> HTML
                 </Button>
               </div>
             </div>
@@ -267,6 +300,7 @@ export function PostEditor({ postId }: { postId: string | null }) {
               </div>
               <TabsContent value="write" className="m-0">
                 <Textarea
+                  ref={contentRef}
                   value={form.content}
                   onChange={(e) => update({ content: e.target.value })}
                   placeholder={'Start writing…\n\n## Use Markdown for formatting\n\n- **bold**, *italic*, > quotes\n- ### subheadings\n- lists\n\nSeparate paragraphs with blank lines.'}
@@ -500,6 +534,21 @@ export function PostEditor({ postId }: { postId: string | null }) {
         defaultPrompt={form.title}
         onUseAsCover={(img) => { update({ coverImage: img.url, coverAlt: img.prompt.slice(0, 120) }); toast.success('Set as featured image.') }}
         onInsertIntoContent={insertImageIntoContent}
+      />
+
+      {/* Insert HTML dialog */}
+      <InsertHtmlDialog
+        open={showHtmlDialog}
+        onOpenChange={setShowHtmlDialog}
+        onInsert={insertAtCursor}
+      />
+
+      {/* Insert affiliate block dialog */}
+      <InsertAffiliateDialog
+        open={showAffiliateDialog}
+        onOpenChange={setShowAffiliateDialog}
+        links={form.affiliateLinks}
+        onInsert={insertAtCursor}
       />
     </div>
   )
