@@ -16,6 +16,35 @@ interface GenerateBody {
   generateImage?: boolean
 }
 
+/** Generate and save an AI image, returning the public URL or null. */
+async function generateAndSaveImage(zai: any, prompt: string, retries = 2): Promise<string | null> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const imgResponse = await zai.images.generations.create({
+        prompt,
+        size: '1344x768',
+      })
+      const base64 = imgResponse.data?.[0]?.base64
+      if (!base64) throw new Error('No image data returned')
+      const buffer = Buffer.from(base64, 'base64')
+      const filename = `ai-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+      await mkdir(uploadDir, { recursive: true })
+      await writeFile(path.join(uploadDir, filename), buffer)
+      const url = `/uploads/${filename}`
+      await db.media.create({ data: { url, alt: prompt.slice(0, 200), type: 'image' } })
+      return url
+    } catch (e) {
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, 3000 * (attempt + 1)))
+        continue
+      }
+      return null
+    }
+  }
+  return null
+}
+
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -38,7 +67,6 @@ export async function POST(req: NextRequest) {
   try {
     const zai = await ZAI.create()
 
-    // Build the system prompt for SEO-optimized content generation
     const systemPrompt = `You are an expert SEO content writer and editor for an art blog (Christine Britton — fluid art, resin art, drawing, doodle art, posca art, clay art). You write high-quality, original, AdSense-friendly articles that score 88%+ on SEO checks. You write in Markdown.`
 
     const userPrompt = `Write a comprehensive, SEO-optimized blog article with the following requirements:
@@ -62,33 +90,64 @@ export async function POST(req: NextRequest) {
 11. Do NOT include any meta description, SEO score, or commentary — only the article markdown.
 12. Do NOT wrap the output in code blocks.
 
+## Table of Contents (REQUIRED):
+Immediately AFTER the title and BEFORE the first paragraph, insert a table of contents in this exact HTML format:
+
+<div class="table-of-contents">
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#section-1">First Section Title</a></li>
+<li><a href="#section-2">Second Section Title</a></li>
+<li><a href="#section-3">Third Section Title</a></li>
+</ol>
+</div>
+
+Then for each H2 heading in the article, add an id attribute matching the href, like: ## First Section Title {#section-1}
+Use section-1, section-2, section-3 etc. as IDs, matching the order of the TOC entries.
+
 ## Content structure:
 # [Engaging title with focus keyword]
 
+<div class="table-of-contents">
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#section-1">[First H2 title]</a></li>
+<li><a href="#section-2">[Second H2 title]</a></li>
+<li><a href="#section-3">[Third H2 title]</a></li>
+</ol>
+</div>
+
 [Introductory paragraph that includes the focus keyword and hooks the reader]
 
-## [First major section with focus keyword if natural]
+## [First major section] {#section-1}
 [Content with related keywords, external links to authoritative sources]
 
 ### [Subsection]
 [Detailed content]
 
-## [Second major section]
+## [Second major section] {#section-2}
 [More content with examples and external links]
 
-## Conclusion
+## [Third major section or Conclusion] {#section-3}
 [Summary paragraph with focus keyword]
 
 Write the article now:`
 
-    // Call GLM to generate the article
-    const completion = await zai.chat.completions.create({
+    // Start text generation and image generation IN PARALLEL for speed
+    const textPromise = zai.chat.completions.create({
       messages: [
         { role: 'assistant', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
       thinking: { type: 'disabled' },
     })
+
+    const imagePromise = generateImage
+      ? generateAndSaveImage(zai, `A vibrant, editorial-style illustration for an article about "${focusKeyword}". Art style: ${body.category || 'fluid art'}. Professional, high-quality, suitable for a blog cover image.`, 2)
+      : Promise.resolve(null)
+
+    // Wait for both in parallel
+    const [completion, coverImage] = await Promise.all([textPromise, imagePromise])
 
     let articleContent = completion.choices[0]?.message?.content || ''
 
@@ -107,32 +166,6 @@ Write the article now:`
     // Auto-generate excerpt
     const excerpt = excerptFromContent(contentWithoutH1, 155)
 
-    // Generate cover image
-    let coverImage: string | null = null
-    let coverAlt = ''
-    if (generateImage) {
-      try {
-        const imgPrompt = `A vibrant, editorial-style illustration for an article about "${focusKeyword}". Art style: ${body.category || 'fluid art'}. Professional, high-quality, suitable for a blog cover image.`
-        const imgResponse = await zai.images.generations.create({
-          prompt: imgPrompt,
-          size: '1344x768',
-        })
-        const base64 = imgResponse.data?.[0]?.base64
-        if (base64) {
-          const buffer = Buffer.from(base64, 'base64')
-          const filename = `ai-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`
-          const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-          await mkdir(uploadDir, { recursive: true })
-          await writeFile(path.join(uploadDir, filename), buffer)
-          coverImage = `/uploads/${filename}`
-          coverAlt = `${focusKeyword} — ${title.slice(0, 100)}`
-          await db.media.create({ data: { url: coverImage, alt: coverAlt, type: 'image' } })
-        }
-      } catch (e) {
-        // image generation is optional; continue without it
-      }
-    }
-
     // Generate meta description
     const metaDescription = excerpt
 
@@ -143,7 +176,7 @@ Write the article now:`
       excerpt,
       metaDescription,
       slug,
-      coverAlt,
+      coverAlt: coverImage ? `${focusKeyword} — ${title.slice(0, 100)}` : '',
       focusKeyword,
       relatedKeywords,
     })
@@ -159,13 +192,14 @@ Write the article now:`
       metaTitle: title,
       metaDescription,
       coverImage,
-      coverAlt,
+      coverAlt: coverImage ? `${focusKeyword} — ${title.slice(0, 100)}` : '',
       tags,
       focusKeyword,
       relatedKeywords,
       seoScore: seoResult,
       readMinutes: estimateReadTime(contentWithoutH1),
       wordCount: contentWithoutH1.split(/\s+/).filter(Boolean).length,
+      imageGenerated: !!coverImage,
     })
   } catch (e: any) {
     const msg = e?.message || 'AI generation failed'

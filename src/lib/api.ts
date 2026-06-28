@@ -113,6 +113,7 @@ export const api = {
       }
       readMinutes: number
       wordCount: number
+      imageGenerated?: boolean
     }>('/api/ai-generate-post', { method: 'POST', body: JSON.stringify(data) }),
   pages: {
     list: () => request<{ pages: Page[] }>('/api/pages'),

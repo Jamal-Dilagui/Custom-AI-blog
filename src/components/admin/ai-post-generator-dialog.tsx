@@ -33,6 +33,7 @@ interface GeneratedPost {
   }
   readMinutes: number
   wordCount: number
+  imageGenerated?: boolean
 }
 
 interface Props {
@@ -225,9 +226,14 @@ export function AIPostGeneratorDialog({ open, onOpenChange, categories, onUse }:
                   <p className="text-xs text-muted-foreground">{result.wordCount} words · {result.readMinutes} min read · {result.seoScore.checks.filter((c) => c.passed).length}/{result.seoScore.checks.length} checks passed</p>
                 </div>
               </div>
-              {result.coverImage && (
+              {result.coverImage ? (
                 <div className="h-16 w-24 rounded-md overflow-hidden bg-muted shrink-0">
                   <img src={result.coverImage} alt="" className="h-full w-full object-cover" />
+                </div>
+              ) : (
+                <div className="text-right shrink-0">
+                  <p className="text-xs text-amber-600 font-medium">⚠ Image failed</p>
+                  <p className="text-[10px] text-muted-foreground">You can add one manually</p>
                 </div>
               )}
             </div>
