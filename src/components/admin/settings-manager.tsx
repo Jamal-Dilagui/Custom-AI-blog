@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Save, Loader2, Megaphone, Globe, Palette, Mail, User, Image as ImageIcon } from 'lucide-react'
+import { Save, Loader2, Megaphone, Globe, Palette, Mail, User, Image as ImageIcon, Wand2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function SettingsManager() {
@@ -60,6 +60,7 @@ export function SettingsManager() {
           <TabsTrigger value="about"><User className="h-3.5 w-3.5 mr-1.5" /> About</TabsTrigger>
           <TabsTrigger value="adsense"><Megaphone className="h-3.5 w-3.5 mr-1.5" /> AdSense</TabsTrigger>
           <TabsTrigger value="social"><Mail className="h-3.5 w-3.5 mr-1.5" /> Social</TabsTrigger>
+          <TabsTrigger value="ai"><Wand2 className="h-3.5 w-3.5 mr-1.5" /> AI</TabsTrigger>
         </TabsList>
 
         {/* General */}
@@ -177,6 +178,36 @@ export function SettingsManager() {
               <Field label="LinkedIn (username or page)"><Input value={s.linkedin || ''} onChange={(e) => update({ linkedin: e.target.value })} /></Field>
               <Field label="Pinterest"><Input value={s.pinterest || ''} onChange={(e) => update({ pinterest: e.target.value })} /></Field>
               <Field label="YouTube channel"><Input value={s.youtube || ''} onChange={(e) => update({ youtube: e.target.value })} /></Field>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* AI */}
+        <TabsContent value="ai" className="space-y-4 mt-4">
+          <Card>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Wand2 className="h-4 w-4 text-primary" /> AI Post Generator</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-lg bg-primary/5 border border-primary/20 p-4 text-sm">
+                <p className="font-medium text-primary mb-1">GLM AI Integration</p>
+                <p className="text-muted-foreground text-xs">The AI post generator uses GLM (via z-ai-web-dev-sdk) to create SEO-optimized articles with a focus keyword, related keywords, external links, and an AI-generated cover image. The built-in SEO scorer ensures each article scores 88%+ before publishing.</p>
+              </div>
+              <Field label="API Key (optional)" hint="leave blank to use the built-in SDK">
+                <Input value={s.aiApiKey || ''} onChange={(e) => update({ aiApiKey: e.target.value })} placeholder="auto-configured" className="font-mono" type="password" />
+              </Field>
+              <Field label="Model">
+                <Input value={s.aiModel || ''} onChange={(e) => update({ aiModel: e.target.value })} placeholder="glm-5.2" className="font-mono" />
+              </Field>
+              <div className="rounded-lg bg-muted/50 p-4 text-xs text-muted-foreground">
+                <p className="font-medium text-foreground mb-1">How to use:</p>
+                <ol className="list-decimal ml-4 space-y-0.5">
+                  <li>Go to <strong>Articles → AI Generate</strong></li>
+                  <li>Enter your focus keyword and related keywords</li>
+                  <li>Choose a category and tone</li>
+                  <li>Click <strong>Generate article</strong> — AI writes 700+ words with external links and generates a cover image</li>
+                  <li>Review the SEO score (target: 88%+) and content preview</li>
+                  <li>Click <strong>Use this article</strong> — a draft is created in the editor for you to review and publish</li>
+                </ol>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

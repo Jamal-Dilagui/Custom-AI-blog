@@ -126,6 +126,9 @@ model SiteSetting {
   newsletterText  String?
   // Footer
   footerText      String?
+  // AI post generator
+  aiApiKey        String?
+  aiModel         String?  @default("glm-5.2")
   updatedAt       DateTime @updatedAt
 }
 

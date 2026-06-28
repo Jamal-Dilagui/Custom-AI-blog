@@ -95,6 +95,8 @@ export interface SiteSetting {
   newsletterTitle?: string | null
   newsletterText?: string | null
   footerText?: string | null
+  aiApiKey?: string | null
+  aiModel?: string | null
 }
 
 export interface Media {

@@ -86,6 +86,34 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ prompt, size }),
     }),
+  aiGeneratePost: (data: {
+    focusKeyword: string
+    relatedKeywords: string[]
+    topic?: string
+    category?: string
+    tone?: string
+    generateImage?: boolean
+  }) =>
+    request<{
+      title: string
+      slug: string
+      content: string
+      excerpt: string
+      metaTitle: string
+      metaDescription: string
+      coverImage: string | null
+      coverAlt: string
+      tags: string
+      focusKeyword: string
+      relatedKeywords: string[]
+      seoScore: {
+        score: number
+        passed: boolean
+        checks: { label: string; passed: boolean; points: number; maxPoints: number; detail: string }[]
+      }
+      readMinutes: number
+      wordCount: number
+    }>('/api/ai-generate-post', { method: 'POST', body: JSON.stringify(data) }),
   pages: {
     list: () => request<{ pages: Page[] }>('/api/pages'),
     getBySlug: (slug: string) => request<{ page: Page }>(`/api/pages/slug/${slug}`),

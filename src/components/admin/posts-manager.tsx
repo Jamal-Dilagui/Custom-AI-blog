@@ -10,13 +10,14 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { PenSquare, Trash2, Search, MoreVertical, Eye, Loader2, Plus, FileText, Clock } from 'lucide-react'
+import { PenSquare, Trash2, Search, MoreVertical, Eye, Loader2, Plus, FileText, Clock, Wand2 } from 'lucide-react'
 import { formatShortDate } from '@/lib/helpers'
 import { toast } from 'sonner'
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { AIPostGeneratorDialog, type GeneratedPost } from './ai-post-generator-dialog'
 
 type P = Post & { author: User; category: Category }
 
@@ -29,6 +30,8 @@ export function PostsManager() {
   const [status, setStatus] = useState('ALL')
   const [category, setCategory] = useState('ALL')
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [showAIGenerator, setShowAIGenerator] = useState(false)
+  const [aiPost, setAiPost] = useState<GeneratedPost | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -86,7 +89,12 @@ export function PostsManager() {
             {categories.map((c) => <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Button onClick={() => editPost(null)}><Plus className="h-4 w-4 mr-1.5" /> New article</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowAIGenerator(true)} className="border-primary/40 text-primary hover:bg-primary/10">
+            <Wand2 className="h-4 w-4 mr-1.5" /> AI Generate
+          </Button>
+          <Button onClick={() => editPost(null)}><Plus className="h-4 w-4 mr-1.5" /> New article</Button>
+        </div>
       </div>
 
       {/* List */}
@@ -170,6 +178,41 @@ export function PostsManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AIPostGeneratorDialog
+        open={showAIGenerator}
+        onOpenChange={setShowAIGenerator}
+        categories={categories}
+        onUse={async (gen) => {
+          setAiPost(gen)
+          setShowAIGenerator(false)
+          // Create the post as a draft with the generated content
+          try {
+            const cat = categories.find((c) => c.name === (gen as any).category) || categories[0]
+            const { post } = await api.posts.create({
+              title: gen.title,
+              slug: gen.slug,
+              content: gen.content,
+              excerpt: gen.excerpt,
+              coverImage: gen.coverImage || null,
+              coverAlt: gen.coverAlt,
+              tags: gen.tags,
+              categoryId: cat?.id,
+              status: 'DRAFT',
+              featured: false,
+              trending: false,
+              showAds: true,
+              metaTitle: gen.metaTitle,
+              metaDescription: gen.metaDescription,
+            })
+            toast.success(`Draft created with SEO score ${gen.seoScore.score}%. Review and publish.`)
+            load()
+            editPost(post.id)
+          } catch (e: any) {
+            toast.error(e.message || 'Could not create draft.')
+          }
+        }}
+      />
     </div>
   )
 }

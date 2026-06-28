@@ -159,3 +159,28 @@ Stage Summary:
 - Markdown renderer now supports raw HTML via rehype-raw, so any HTML the admin inserts renders correctly.
 - Responsive: cards stack vertically on mobile with a horizontal image-left layout for better mobile UX.
 - ESLint clean, all features browser-verified.
+
+---
+Task ID: 56-63
+Agent: main (Z.ai Code)
+Task: Build AI post generator using GLM 5.2 API with focus/related keywords, SEO 88%+ score, external links, AI image, and API key in settings.
+
+Work Log:
+- Updated Prisma schema: added `aiApiKey` and `aiModel` fields to SiteSetting. Pushed to DB + regenerated Prisma client.
+- Built `src/lib/seo-score.ts` — a comprehensive SEO score calculator with 12 weighted checks: focus keyword in title (10pts), first paragraph (10pts), headings (10pts), keyword density 0.5-2.5% (10pts), related keywords present (10pts), content length 600+ words (10pts), meta description 120-160 chars with keyword (10pts), external links 2+ (10pts), image alt text with keyword (5pts), slug with keyword (5pts), heading structure 2+ H2/1+ H3 (5pts), readable paragraphs avg ≤120 words (5pts). Returns 0-100 score with pass/fail at 88%.
+- Built `/api/ai-generate-post` route: calls GLM (z-ai-web-dev-sdk chat.completions) with a detailed SEO-focused system prompt that instructs the model to write 700+ words, include the focus keyword in title/first paragraph/headings, include 3+ external links to authoritative sources (Wikipedia, Tate, Smithsonian, etc.), use related keywords, and follow proper heading structure. Also calls the image generation API to create a cover image. Returns the generated content + SEO score + all metadata.
+- Added `aiGeneratePost` method to the API client.
+- Built `AIPostGeneratorDialog` component: form with focus keyword (required), related keywords (tag input with add/remove), topic, category, tone selector, generate-image toggle. On generate: shows loading state, then displays results with a prominent SEO score banner (green if ≥88%, amber if below), 12-check breakdown with pass/fail details, content preview toggle, metadata. "Regenerate" and "Use this article" actions.
+- Updated `PostsManager`: added "AI Generate" button (primary-colored outline) next to "New article". When the user generates and clicks "Use this article", automatically creates a draft post with all generated fields (title, slug, content, excerpt, cover image, tags, meta title/description) and opens the editor for review.
+- Added "AI" tab to `SettingsManager`: GLM AI integration description, API key input (optional, password field), model input (default "glm-5.2"), and a step-by-step usage guide.
+- Updated settings API route to allow aiApiKey/aiModel fields; updated SiteSetting type.
+- Verified end-to-end with Agent Browser: opened admin → Articles → AI Generate → entered focus keyword "acrylic pouring for beginners" + 3 related keywords (dirty pour, flip cup technique, acrylic pouring medium) → clicked Generate → GLM wrote 817-word article with proper H2/H3 structure and external links → AI generated cover image → SEO score: 97% (12/12 checks passed, far exceeding the 88% target) → clicked "Use this article" → draft created in editor with all fields populated → verified in database. Also verified Settings → AI tab shows API key and model inputs.
+
+Stage Summary:
+- Complete AI post generator fully functional and browser-verified:
+  1. GLM 5.2 text generation: writes 700+ word SEO-optimized articles with focus keyword in title/first-para/headings, related keywords, 3+ external links to authoritative sources.
+  2. AI cover image: auto-generated from the focus keyword.
+  3. SEO scorer: 12-check scoring system, target 88%+ (achieved 97% in test).
+  4. Admin UI: AI Generate button in Posts Manager, full dialog with keyword inputs, live SEO score preview, content preview, one-click draft creation.
+  5. Settings: AI tab with API key and model inputs.
+- ESLint clean, dev server healthy, test draft cleaned up.

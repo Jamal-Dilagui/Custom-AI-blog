@@ -1,0 +1,177 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentUser } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { calculateSEOScore } from '@/lib/seo-score'
+import { slugify, excerptFromContent, estimateReadTime } from '@/lib/helpers'
+import ZAI from 'z-ai-web-dev-sdk'
+import path from 'path'
+import { writeFile, mkdir } from 'fs/promises'
+
+interface GenerateBody {
+  focusKeyword: string
+  relatedKeywords: string[]
+  topic?: string
+  category?: string
+  tone?: string
+  generateImage?: boolean
+}
+
+export async function POST(req: NextRequest) {
+  const user = await getCurrentUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  let body: GenerateBody
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const focusKeyword = (body.focusKeyword || '').trim()
+  if (!focusKeyword) return NextResponse.json({ error: 'Focus keyword is required' }, { status: 400 })
+
+  const relatedKeywords = (body.relatedKeywords || []).filter((k) => k.trim())
+  const topic = body.topic || focusKeyword
+  const tone = body.tone || 'informative and engaging'
+  const generateImage = body.generateImage !== false
+
+  try {
+    const zai = await ZAI.create()
+
+    // Build the system prompt for SEO-optimized content generation
+    const systemPrompt = `You are an expert SEO content writer and editor for an art blog (Christine Britton — fluid art, resin art, drawing, doodle art, posca art, clay art). You write high-quality, original, AdSense-friendly articles that score 88%+ on SEO checks. You write in Markdown.`
+
+    const userPrompt = `Write a comprehensive, SEO-optimized blog article with the following requirements:
+
+**Focus keyword:** ${focusKeyword}
+**Related keywords:** ${relatedKeywords.join(', ') || 'none'}
+**Topic:** ${topic}
+**Tone:** ${tone}
+
+## SEO Requirements (MUST follow all):
+1. Include the focus keyword "${focusKeyword}" in the TITLE (as an H1 at the very top using "# ").
+2. Include the focus keyword "${focusKeyword}" in the FIRST PARAGRAPH (within the first 150 words).
+3. Include the focus keyword "${focusKeyword}" in at least ONE H2 heading (## heading).
+4. Use the focus keyword naturally 4-8 times throughout (density 0.5%-2.5%).
+5. Include at least 2 of the related keywords naturally in the text.
+6. Write at least 700 words of substantive content.
+7. Include at least 2 H2 (##) headings and 1 H3 (###) heading.
+8. Keep paragraphs short (under 120 words on average) for readability.
+9. Include at least 3 EXTERNAL LINKS to authoritative sources (use real URLs like https://en.wikipedia.org/..., https://www.artsy.net/..., https://www.smithsonianmag.com/..., https://www.tate.org.uk/..., etc.). Format links as: [link text](https://example.com)
+10. Include a "## Conclusion" or "## Final thoughts" section at the end.
+11. Do NOT include any meta description, SEO score, or commentary — only the article markdown.
+12. Do NOT wrap the output in code blocks.
+
+## Content structure:
+# [Engaging title with focus keyword]
+
+[Introductory paragraph that includes the focus keyword and hooks the reader]
+
+## [First major section with focus keyword if natural]
+[Content with related keywords, external links to authoritative sources]
+
+### [Subsection]
+[Detailed content]
+
+## [Second major section]
+[More content with examples and external links]
+
+## Conclusion
+[Summary paragraph with focus keyword]
+
+Write the article now:`
+
+    // Call GLM to generate the article
+    const completion = await zai.chat.completions.create({
+      messages: [
+        { role: 'assistant', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      thinking: { type: 'disabled' },
+    })
+
+    let articleContent = completion.choices[0]?.message?.content || ''
+
+    // Clean up: remove code block wrappers if the model added them
+    articleContent = articleContent.replace(/^```(?:markdown)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
+
+    // Extract title from the first H1
+    const titleMatch = articleContent.match(/^#\s+(.+)$/m)
+    const title = titleMatch ? titleMatch[1].trim() : topic
+    // Remove the H1 from the content (we render it separately in the post view)
+    const contentWithoutH1 = articleContent.replace(/^#\s+.+\n?/m, '').trim()
+
+    // Generate slug from title
+    const slug = slugify(title)
+
+    // Auto-generate excerpt
+    const excerpt = excerptFromContent(contentWithoutH1, 155)
+
+    // Generate cover image
+    let coverImage: string | null = null
+    let coverAlt = ''
+    if (generateImage) {
+      try {
+        const imgPrompt = `A vibrant, editorial-style illustration for an article about "${focusKeyword}". Art style: ${body.category || 'fluid art'}. Professional, high-quality, suitable for a blog cover image.`
+        const imgResponse = await zai.images.generations.create({
+          prompt: imgPrompt,
+          size: '1344x768',
+        })
+        const base64 = imgResponse.data?.[0]?.base64
+        if (base64) {
+          const buffer = Buffer.from(base64, 'base64')
+          const filename = `ai-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`
+          const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+          await mkdir(uploadDir, { recursive: true })
+          await writeFile(path.join(uploadDir, filename), buffer)
+          coverImage = `/uploads/${filename}`
+          coverAlt = `${focusKeyword} — ${title.slice(0, 100)}`
+          await db.media.create({ data: { url: coverImage, alt: coverAlt, type: 'image' } })
+        }
+      } catch (e) {
+        // image generation is optional; continue without it
+      }
+    }
+
+    // Generate meta description
+    const metaDescription = excerpt
+
+    // Calculate SEO score
+    const seoResult = calculateSEOScore({
+      title,
+      content: contentWithoutH1,
+      excerpt,
+      metaDescription,
+      slug,
+      coverAlt,
+      focusKeyword,
+      relatedKeywords,
+    })
+
+    // Generate tags from keywords
+    const tags = [focusKeyword, ...relatedKeywords].slice(0, 6).join(', ')
+
+    return NextResponse.json({
+      title,
+      slug,
+      content: contentWithoutH1,
+      excerpt,
+      metaTitle: title,
+      metaDescription,
+      coverImage,
+      coverAlt,
+      tags,
+      focusKeyword,
+      relatedKeywords,
+      seoScore: seoResult,
+      readMinutes: estimateReadTime(contentWithoutH1),
+      wordCount: contentWithoutH1.split(/\s+/).filter(Boolean).length,
+    })
+  } catch (e: any) {
+    const msg = e?.message || 'AI generation failed'
+    if (/429|rate|too many/i.test(msg)) {
+      return NextResponse.json({ error: 'The AI service is busy right now — please wait a few seconds and try again.' }, { status: 429 })
+    }
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
+}

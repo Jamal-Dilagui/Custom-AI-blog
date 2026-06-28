@@ -25,6 +25,7 @@ export async function PUT(req: NextRequest) {
     'adsEnabled',
     'newsletterTitle', 'newsletterText',
     'footerText',
+    'aiApiKey', 'aiModel',
   ]
   const data: any = {}
   for (const k of allowed) if (k in body) data[k] = body[k]
