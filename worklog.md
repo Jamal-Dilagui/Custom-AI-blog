@@ -326,3 +326,36 @@ Stage Summary:
 - Admin panel accessible only via /admin URL (invisible to public visitors).
 - Catch-all route ensures no 404 errors on any valid URL.
 - ESLint clean, all routes browser-verified.
+
+---
+Task ID: 91-96
+Agent: main (Z.ai Code)
+Task: Add theme system with 12 niche presets selectable from admin settings.
+
+Work Log:
+- Added `theme` field to SiteSetting schema (default "art"), pushed to DB + regenerated Prisma client.
+- Created `src/lib/themes.ts` with 12 theme presets:
+  1. Art Studio (terracotta + cream) — Art & Crafts
+  2. Foodie Kitchen (sage green + warm white) — Food & Recipes
+  3. Tech Modern (emerald + dark slate) — Technology
+  4. Lifestyle Bloom (rose + lavender) — Lifestyle & Wellness
+  5. Fashion Noir (black + gold) — Fashion & Style
+  6. Travel Ocean (ocean blue + sandy beige) — Travel & Adventure
+  7. Wellness Calm (teal + sage) — Health & Wellness
+  8. Business Pro (navy + silver) — Business & Finance
+  9. Photography Dark (charcoal + amber) — Photography
+  10. Gaming Neon (purple + cyan) — Gaming & Esports
+  11. Education Bright (indigo + yellow) — Education & Learning
+  12. Minimal Clean (black + white) — Minimalist
+- Each theme defines: primary/accent/background/foreground/card/secondary/muted/border colors + serif/sans font families.
+- Created `applyTheme()` function that sets all CSS custom properties on document.documentElement.
+- Updated settings-context to call `getTheme(setting.theme)` + `applyTheme()` on load — theme applies site-wide instantly.
+- Added "Theme" tab to settings manager with visual preset gallery: color swatches, theme name, niche label, description, checkmark on selected. Clicking a theme applies it instantly (live preview) and updates primaryColor/accentColor fields. Save button persists.
+- Updated types.ts (SiteSetting.theme) and settings API route (allowed fields).
+- Verified with Agent Browser: switched to "Foodie Kitchen" → primary color changed to #4a7c59, saved, confirmed selected. Switched back to "Art Studio" → primary color restored to #b45309.
+
+Stage Summary:
+- 12 niche theme presets selectable from Settings → Theme tab.
+- Themes apply instantly (live preview) with CSS variable overrides for colors + fonts.
+- Theme persists in database and loads on every page load.
+- ESLint clean, browser-verified.

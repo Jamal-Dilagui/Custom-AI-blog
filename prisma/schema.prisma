@@ -129,6 +129,8 @@ model SiteSetting {
   // AI post generator
   aiApiKey        String?
   aiModel         String?  @default("glm-5.2")
+  // Theme
+  theme           String?  @default("art")
   updatedAt       DateTime @updatedAt
 }
 
