@@ -89,6 +89,33 @@ export function PostEditor({ postId }: { postId: string | null }) {
     })
   }
 
+  // Wrap the currently selected text with prefix/suffix (for bold, italic, links, etc.)
+  const wrapSelection = (prefix: string, suffix: string) => {
+    const ta = contentRef.current
+    if (!ta) {
+      update({ content: form.content + prefix + suffix })
+      return
+    }
+    const start = ta.selectionStart
+    const end = ta.selectionEnd
+    const selectedText = form.content.slice(start, end)
+    const before = form.content.slice(0, start)
+    const after = form.content.slice(end)
+    const newContent = before + prefix + selectedText + suffix + after
+    update({ content: newContent })
+    requestAnimationFrame(() => {
+      ta.focus()
+      if (selectedText.length > 0) {
+        // Select the wrapped text (including prefix/suffix)
+        ta.setSelectionRange(start, start + prefix.length + selectedText.length + suffix.length)
+      } else {
+        // Place cursor between prefix and suffix
+        const pos = start + prefix.length
+        ta.setSelectionRange(pos, pos)
+      }
+    })
+  }
+
   useEffect(() => {
     let active = true
     api.categories.list().then(({ categories }) => {
@@ -280,6 +307,9 @@ export function PostEditor({ postId }: { postId: string | null }) {
                 <span className="hidden sm:inline">{wordCount} words</span>
                 <span className="hidden sm:inline">·</span>
                 <span className="hidden sm:inline">{estimateReadTime(form.content)} min read</span>
+                <Button variant="ghost" size="sm" className="h-7" onClick={() => setShowMedia(!showMedia)}>
+                  <ImageIcon className="h-3.5 w-3.5 mr-1 text-primary" /> Add Media
+                </Button>
                 <Button variant="ghost" size="sm" className="h-7" onClick={() => setShowGenerator(true)}>
                   <Wand2 className="h-3.5 w-3.5 mr-1 text-primary" /> AI Image
                 </Button>
@@ -292,13 +322,43 @@ export function PostEditor({ postId }: { postId: string | null }) {
               </div>
             </div>
             <Tabs defaultValue="write">
-              <div className="px-4 pt-2 border-b border-border">
+              <div className="px-4 pt-2 border-b border-border flex items-center justify-between">
                 <TabsList className="bg-transparent h-9">
                   <TabsTrigger value="write" className="text-sm"><Sparkles className="h-3.5 w-3.5 mr-1.5" /> Visual</TabsTrigger>
                   <TabsTrigger value="preview" className="text-sm"><Eye className="h-3.5 w-3.5 mr-1.5" /> Preview</TabsTrigger>
                 </TabsList>
               </div>
               <TabsContent value="write" className="m-0">
+                {/* WordPress-style formatting toolbar */}
+                <div className="flex items-center gap-0.5 flex-wrap px-3 py-1.5 border-b border-border bg-secondary/30">
+                  <button type="button" onClick={() => insertAtCursor('## ')} className="h-8 min-w-8 px-2 text-sm font-bold hover:bg-accent rounded" title="Heading 2">H2</button>
+                  <button type="button" onClick={() => insertAtCursor('### ')} className="h-8 min-w-8 px-2 text-sm font-bold hover:bg-accent rounded" title="Heading 3">H3</button>
+                  <div className="w-px h-5 bg-border mx-1" />
+                  <button type="button" onClick={() => wrapSelection('**', '**')} className="h-8 min-w-8 px-2 text-sm font-bold hover:bg-accent rounded" title="Bold"><b>B</b></button>
+                  <button type="button" onClick={() => wrapSelection('*', '*')} className="h-8 min-w-8 px-2 text-sm italic hover:bg-accent rounded" title="Italic"><i>I</i></button>
+                  <button type="button" onClick={() => wrapSelection('~~', '~~')} className="h-8 min-w-8 px-2 text-sm line-through hover:bg-accent rounded" title="Strikethrough"><s>S</s></button>
+                  <div className="w-px h-5 bg-border mx-1" />
+                  <button type="button" onClick={() => wrapSelection('[', '](https://)')} className="h-8 min-w-8 px-2 hover:bg-accent rounded" title="Insert Link"><Link2 className="h-4 w-4" /></button>
+                  <button type="button" onClick={() => insertAtCursor('\n- ')} className="h-8 min-w-8 px-2 hover:bg-accent rounded" title="Bullet List">• List</button>
+                  <button type="button" onClick={() => insertAtCursor('\n1. ')} className="h-8 min-w-8 px-2 hover:bg-accent rounded" title="Numbered List">1. List</button>
+                  <button type="button" onClick={() => insertAtCursor('\n> ')} className="h-8 min-w-8 px-2 hover:bg-accent rounded" title="Quote">❝</button>
+                  <button type="button" onClick={() => wrapSelection('`', '`')} className="h-8 min-w-8 px-2 hover:bg-accent rounded font-mono text-xs" title="Inline Code">&lt;/&gt;</button>
+                  <button type="button" onClick={() => insertAtCursor('\n\n---\n\n')} className="h-8 min-w-8 px-2 hover:bg-accent rounded" title="Horizontal Rule">―</button>
+                </div>
+                {/* Media library picker (collapsible) */}
+                {showMedia && (
+                  <div className="p-3 border-b border-border bg-muted/30 max-h-48 overflow-y-auto scroll-lumen">
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                      {media.length === 0 ? (
+                        <p className="col-span-full text-center text-xs text-muted-foreground py-3">No images in library. Upload via the Featured Image metabox or AI Image button.</p>
+                      ) : media.map((m) => (
+                        <button key={m.id} type="button" onClick={() => { insertAtCursor(`\n\n![${m.alt || 'image'}](${m.url})\n\n`); setShowMedia(false) }} className="aspect-square overflow-hidden rounded-md border border-border hover:ring-2 ring-primary">
+                          <img src={m.url} alt={m.alt || ''} className="h-full w-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <Textarea
                   ref={contentRef}
                   value={form.content}

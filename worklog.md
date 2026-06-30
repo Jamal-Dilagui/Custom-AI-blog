@@ -211,3 +211,19 @@ Stage Summary:
 - Text arrives first (fast, within gateway timeout), image generates second with a clear loading indicator.
 - User can use the article immediately after text arrives (image is optional and can be added manually if it fails).
 - ESLint clean, 0 504 errors, browser-verified.
+
+---
+Task ID: 70-72
+Agent: main (Z.ai Code)
+Task: Add WordPress-style formatting toolbar and Add Media button to post editor.
+
+Work Log:
+- Analyzed the 5 recent images uploaded by user — all showed WordPress classic editor interface with formatting toolbar, Visual/Text tabs, Add Media button.
+- Added WordPress-style formatting toolbar to the content editor in post-editor.tsx with 11 buttons: H2, H3, Bold (B), Italic (I), Strikethrough (S), Insert Link, Bullet List, Numbered List, Quote, Inline Code, Horizontal Rule.
+- Added `wrapSelection(prefix, suffix)` function that wraps the currently selected text with markdown syntax (for bold, italic, links, code) and restores cursor position.
+- Added "Add Media" button to the content toolbar that toggles a collapsible media library picker grid — clicking an image inserts markdown image syntax at cursor.
+- Verified with Agent Browser: all 11 formatting buttons present (Heading 2, Heading 3, Bold, Italic, Strikethrough, Insert Link, Bullet List, Numbered List, Quote, Inline Code, Horizontal Rule), Add Media button present, AI Image + Affiliate + HTML buttons still present.
+- ESLint clean.
+
+Stage Summary:
+- Post editor now matches WordPress classic editor with: formatting toolbar (11 markdown buttons), Add Media button with library picker, Visual/Preview tabs, AI Image/Affiliate/HTML insert buttons, plus all existing features (scheduling, affiliate links, SEO metabox, featured image, etc.).
